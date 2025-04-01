@@ -8,13 +8,22 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import net.st1ch.minecraftacademy.MinecraftAcademy;
+import net.st1ch.minecraftacademy.item.custom.MagickStickItem;
 
 public class ModItems {
     public static final Item SOME_ITEM = registerItem(
             "some_item",
-            new Item(new Item.Settings().food(
-                    new FoodComponent.Builder().build()
-            ))
+            new Item(
+                    new Item.Settings().food(
+                            new FoodComponent.Builder().build()
+                    )
+            )
+    );
+    public static final Item MAGIC_STICK = registerItem(
+            "magic_stick",
+            new MagickStickItem(
+                new Item.Settings().maxDamage(32)
+            )
     );
 
     private static Item registerItem(String name, Item item) {
@@ -25,6 +34,7 @@ public class ModItems {
         MinecraftAcademy.LOGGER.info("Registering mod items for " + MinecraftAcademy.MOD_ID);
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(fabricItemGroupEntries -> {
             fabricItemGroupEntries.add(SOME_ITEM);
+            fabricItemGroupEntries.add(MAGIC_STICK);
         });
     }
 }
