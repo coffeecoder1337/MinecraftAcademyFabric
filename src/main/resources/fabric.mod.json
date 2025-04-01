@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "minecraft-academy",
+	"version": "${version}",
+	"name": "Minecraft Academy",
+	"description": "Выпускная квалификационная работа",
+	"authors": [
+		"Крохалев Вячеслав Александрович"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "MIT",
+	"icon": "assets/minecraft-academy/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.st1ch.minecraftacademy.MinecraftAcademy"
+		],
+		"fabric-datagen": [
+			"net.st1ch.minecraftacademy.MinecraftAcademyDataGenerator"
+		],
+		"client": [
+			"net.st1ch.minecraftacademy.MinecraftAcademyClient"
+		]
+	},
+	"mixins": [
+		"minecraft-academy.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.10",
+		"minecraft": "~1.21.1",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
