@@ -7,7 +7,9 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.PathAwareEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.*;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -15,11 +17,11 @@ public class RobotEntity extends PathAwareEntity {
     // animations
     public final AnimationState movingHandsAnimationState = new AnimationState();
     private int movingHandsAnimationTimeout = 0;
-    private int movingHandsAnimationTicks = 25;
+    private final int movingHandsAnimationTicks = 25;
 
     // params
-    private double rotationSpeed = 0.0;
-    private double moveSpeed = 0.0;
+    private double rotationSpeed = 0;
+    private double moveSpeed = 0;
 
     public RobotEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
@@ -45,38 +47,58 @@ public class RobotEntity extends PathAwareEntity {
         this.moveSpeed = moveSpeed;
     }
 
+    public void sendRobotIdToChat(PlayerEntity player, String robotId) {
+        Text robotIdText = Text.literal("ID робота: " + robotId)
+                .setStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, robotId))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Щелкните, чтобы скопировать"))));
+
+        player.sendMessage(robotIdText, false);
+    }
+
     @Override
     public boolean isPushable() {
         return false;
     }
 
+
     @Override
-    protected void pushAway(Entity entity) {
+    public boolean damage(DamageSource source, float amount) {
+        return false;
     }
 
 //    @Override
-//    public boolean damage(DamageSource source, float amount) {
-//        return false;
+//    public void travel(Vec3d movementInput) {
+//        if (!this.isOnGround()) {
+//            this.setVelocity(this.getVelocity().add(0, -0.04, 0)); // Гравитация
+//        }
 //    }
+
+    private void move() {
+        if (!this.isOnGround()) {
+            this.setVelocity(this.getVelocity().add(0, -0.04, 0)); // gravity
+        } else {
+            // rotating with some speed
+            this.setYaw(this.getYaw() + (float) this.rotationSpeed);
+
+            // move forward with some speed
+            double radians = Math.toRadians(this.getYaw());
+            double x = -Math.sin(radians) * this.moveSpeed;
+            double z = Math.cos(radians) * this.moveSpeed;
+
+            this.setVelocity(new Vec3d(x, this.getVelocity().y, z));
+            this.velocityDirty = true;
+        }
+    }
 
     @Override
     public void tick() {
         super.tick();
 
         if (this.getWorld().isClient()) {
-            this.setupAnimationStates();
+//            this.setupAnimationStates();
+        } else {
+            this.move();
         }
-
-        // rotating with some speed
-        this.setYaw(this.getYaw() + (float) this.rotationSpeed);
-
-        // move forward with some speed
-        double radians = Math.toRadians(this.getYaw());
-        double x = -Math.sin(radians) * this.moveSpeed;
-        double z = Math.cos(radians) * this.moveSpeed;
-
-        this.setVelocity(new Vec3d(x, 0, z));
-        this.velocityDirty = true;
     }
 }
 
