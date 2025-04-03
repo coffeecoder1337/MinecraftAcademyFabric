@@ -1,4 +1,6 @@
 {
   "item.minecraft-academy.some_item": "Some Item",
-  "item.minecraft-academy.magic_stick": "Magick Stick"
+  "item.minecraft-academy.magic_stick": "Magick Stick",
+  "item.minecraft-academy.robot_spawn_egg": "Robot Spawn Egg",
+  "entity.minecraft-academy.robot": "Robot"
 }
