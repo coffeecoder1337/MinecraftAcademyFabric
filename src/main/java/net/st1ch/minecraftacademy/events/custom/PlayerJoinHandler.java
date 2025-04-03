@@ -1,6 +1,7 @@
 package net.st1ch.minecraftacademy.events.custom;
 
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -11,24 +12,29 @@ import net.st1ch.minecraftacademy.entity.custom.RobotEntity;
 public class PlayerJoinHandler {
     public static void register() {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            ServerPlayerEntity player = handler.getPlayer();
-            ServerWorld world = player.getServerWorld();
+            server.execute(() -> {
+                ServerPlayerEntity player = handler.getPlayer();
+                System.out.println("ID игрока: " + player.getId());
+                ServerWorld world = player.getServerWorld();
 
-            // Устанавливаем точку спавна игрока
-            BlockPos spawnPos = new BlockPos(100, 100, 100); // Координаты спавна
-            player.teleport(world, spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(), 0, 0);
+                // Устанавливаем точку спавна игрока
+                BlockPos spawnPos = new BlockPos(100, 100, 100); // Координаты спавна
+                player.teleport(world, spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(), 0, 0);
 
-            // Создаём мини-спавн (например, из блоков)
-            buildMiniSpawn(world, spawnPos);
+                // Создаём мини-спавн (например, из блоков)
+                buildMiniSpawn(world, spawnPos);
 
-            // Спавним робота рядом с игроком
-            RobotEntity robot = new RobotEntity(ModEntities.ROBOT, world);
-            robot.refreshPositionAndAngles(spawnPos.getX() + 1, spawnPos.getY(), spawnPos.getZ() + 1, 0, 0);
-            world.spawnEntity(robot);
+                // Спавним робота рядом с игроком
+                RobotEntity robot = new RobotEntity(ModEntities.ROBOT, world);
+                robot.refreshPositionAndAngles(spawnPos.getX() + 1, spawnPos.getY(), spawnPos.getZ() + 1, 0, 0);
+                String robotID = robot.getUuidAsString();
+                world.spawnEntity(robot);
+//            UDPServer.registerRobot(robotID, robot);
 
-            // Отправляем сообщение в чат с ID робота
-            player.sendMessage(Text.of("Ваш робот создан!" ), false);
-            robot.sendRobotIdToChat(player, robot.getUuidAsString());
+                // Отправляем сообщение в чат с ID робота
+                player.sendMessage(Text.of("Ваш робот создан!" ), false);
+                robot.sendRobotIdToChat(player, robotID);
+            });
         });
     }
 

@@ -12,6 +12,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.*;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.st1ch.minecraftacademy.network.UDPServer;
 
 public class RobotEntity extends PathAwareEntity {
     // animations
@@ -25,6 +26,7 @@ public class RobotEntity extends PathAwareEntity {
 
     public RobotEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
+        UDPServer.registerRobot(this.getUuidAsString(), this);
     }
 
     public static DefaultAttributeContainer.Builder createRobotAttributes() {
@@ -78,7 +80,17 @@ public class RobotEntity extends PathAwareEntity {
             this.setVelocity(this.getVelocity().add(0, -0.04, 0)); // gravity
         } else {
             // rotating with some speed
-            this.setYaw(this.getYaw() + (float) this.rotationSpeed);
+            float newYaw = this.getYaw() + (float) this.rotationSpeed;
+
+            // Normalize the yaw to ensure it stays within [-180, 180]
+            if (newYaw > 180.0F) {
+                newYaw -= 360.0F;
+            } else if (newYaw < -180.0F) {
+                newYaw += 360.0F;
+            }
+
+            this.setYaw(newYaw);
+            this.setHeadYaw(newYaw);
 
             // move forward with some speed
             double radians = Math.toRadians(this.getYaw());
