@@ -2,8 +2,7 @@ package net.st1ch.minecraftacademy.network;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import net.minecraft.server.MinecraftServer;
-import net.st1ch.minecraftacademy.entity.custom.RobotEntity;
+import net.st1ch.minecraftacademy.entity.custom.robot.RobotEntity;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;

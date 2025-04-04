@@ -8,7 +8,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.st1ch.minecraftacademy.MinecraftAcademy;
-import net.st1ch.minecraftacademy.entity.custom.RobotEntity;
+import net.st1ch.minecraftacademy.entity.custom.robot.RobotEntity;
 
 
 public class RobotModel<T extends RobotEntity> extends SinglePartEntityModel<T> {

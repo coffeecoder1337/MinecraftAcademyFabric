@@ -6,7 +6,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.st1ch.minecraftacademy.commands.ModCommands;
 import net.st1ch.minecraftacademy.entity.ModEntities;
-import net.st1ch.minecraftacademy.entity.custom.RobotEntity;
+import net.st1ch.minecraftacademy.entity.custom.robot.RobotEntity;
 import net.st1ch.minecraftacademy.events.ModEvents;
 import net.st1ch.minecraftacademy.item.ModItems;
 import net.st1ch.minecraftacademy.network.UDPServer;

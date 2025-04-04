@@ -6,7 +6,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import net.st1ch.minecraftacademy.MinecraftAcademy;
-import net.st1ch.minecraftacademy.entity.custom.RobotEntity;
+import net.st1ch.minecraftacademy.entity.custom.robot.RobotEntity;
 
 public class ModEntities {
     public static final EntityType<RobotEntity> ROBOT = Registry.register(

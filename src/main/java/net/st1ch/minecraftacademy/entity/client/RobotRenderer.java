@@ -4,10 +4,9 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.MobEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.Identifier;
 import net.st1ch.minecraftacademy.MinecraftAcademy;
-import net.st1ch.minecraftacademy.entity.custom.RobotEntity;
+import net.st1ch.minecraftacademy.entity.custom.robot.RobotEntity;
 
 public class RobotRenderer extends MobEntityRenderer<RobotEntity, RobotModel<RobotEntity>> {
     public RobotRenderer(EntityRendererFactory.Context context) {

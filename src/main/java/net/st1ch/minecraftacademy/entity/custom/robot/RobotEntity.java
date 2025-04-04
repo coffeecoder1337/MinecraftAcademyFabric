@@ -1,14 +1,12 @@
-package net.st1ch.minecraftacademy.entity.custom;
+package net.st1ch.minecraftacademy.entity.custom.robot;
 
 import net.minecraft.entity.AnimationState;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.*;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -23,6 +21,8 @@ public class RobotEntity extends PathAwareEntity {
     // params
     private double rotationSpeed = 0;
     private double moveSpeed = 0;
+    public RobotSensors sensors = new RobotSensors(this);
+    private int printSensorsTimeout = 40;
 
     public RobotEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
@@ -110,6 +110,8 @@ public class RobotEntity extends PathAwareEntity {
 //            this.setupAnimationStates();
         } else {
             this.move();
+            if (printSensorsTimeout <= 0) { System.out.println(this.sensors.getSensorData()); printSensorsTimeout=40; }
+            else --printSensorsTimeout;
         }
     }
 }
