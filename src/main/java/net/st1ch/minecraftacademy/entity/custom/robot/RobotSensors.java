@@ -1,8 +1,15 @@
 package net.st1ch.minecraftacademy.entity.custom.robot;
 
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.client.gl.SimpleFramebuffer;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.texture.NativeImage;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -12,7 +19,14 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.util.*;
+
+import static com.mojang.blaze3d.platform.GlConst.GL_READ_FRAMEBUFFER;
+import static org.lwjgl.opengl.GL11C.*;
 
 public class RobotSensors {
     private final RobotEntity robot;
@@ -164,4 +178,79 @@ public class RobotSensors {
 //        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, clientAddress, clientPort);
 //        socket.send(packet);
 //    }
+
+    public void getCameraImage(){
+        RobotCameraCapture.requestCapture(this.robot);
+    }
+
+    public void getCameraImage1(MinecraftClient client) {
+        if (client.world == null) return;
+        // Используем Framebuffer 128x128
+        Framebuffer framebuffer = new SimpleFramebuffer(128, 128, true, MinecraftClient.IS_SYSTEM_MAC);
+        framebuffer.setClearColor(0, 0, 0, 0);
+        framebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
+
+//        // Сохраняем текущую камеру
+        Entity originalCamera = client.getCameraEntity();
+
+        Camera customCamera = new Camera();
+        customCamera.update(client.world, this.robot, false, false, 1.0F);
+
+        Framebuffer mainFramebuffer = client.getFramebuffer();
+        framebuffer.beginWrite(false);
+
+        client.gameRenderer.renderWorld(client.getRenderTickCounter());
+
+        // Сохраняем изображение
+        RenderSystem.recordRenderCall(() -> {
+            NativeImage image = readFramebuffer(framebuffer);
+            System.out.println("Got image");
+
+            saveImage(image, "robot_view.png");
+        });
+
+
+
+        client.setCameraEntity(originalCamera);
+        mainFramebuffer.beginWrite(false);
+    }
+
+    private void saveImage(NativeImage image, String name) {
+        File file = new File("screenshots/" + name);
+        try {
+            Files.createDirectories(file.getParentFile().toPath());
+            image.writeTo(file.toPath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private NativeImage readFramebuffer(Framebuffer framebuffer) {
+        int width = framebuffer.textureWidth;
+        int height = framebuffer.textureHeight;
+
+        NativeImage image = new NativeImage(width, height, true);
+
+        // Привязываем буфер для чтения
+        RenderSystem.bindTexture(framebuffer.getColorAttachment());
+        RenderSystem.glBindBuffer(GL_READ_FRAMEBUFFER, framebuffer.fbo);
+
+        // Чтение пикселей из GPU
+        try {
+            glReadPixels(
+                    0, 0,
+                    width, height,
+                    GL_RGBA,
+                    GL_UNSIGNED_BYTE,
+                    ByteBuffer.wrap(image.getBytes())
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        // Разворачиваем изображение по вертикали (OpenGL origin — bottom-left)
+        image.mirrorVertically();
+
+        return image;
+    }
 }
