@@ -4,12 +4,22 @@ import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-import net.st1ch.minecraftacademy.commands.ModCommands;
+import net.st1ch.minecraftacademy.auth.UserManager;
+import net.st1ch.minecraftacademy.auth.UserRoleManager;
+import net.st1ch.minecraftacademy.commands.entity.robot.RemoveRobots;
+import net.st1ch.minecraftacademy.commands.invite.AcceptCommand;
+import net.st1ch.minecraftacademy.commands.invite.DenyCommand;
+import net.st1ch.minecraftacademy.commands.invite.InviteCommand;
+import net.st1ch.minecraftacademy.commands.invite.LeaveRoomCommand;
+import net.st1ch.minecraftacademy.commands.room.CreateRoomCommand;
+import net.st1ch.minecraftacademy.commands.user.GetTokenCommand;
 import net.st1ch.minecraftacademy.entity.ModEntities;
 import net.st1ch.minecraftacademy.entity.custom.robot.RobotEntity;
 import net.st1ch.minecraftacademy.events.ModEvents;
 import net.st1ch.minecraftacademy.item.ModItems;
 import net.st1ch.minecraftacademy.network.UDPServer;
+import net.st1ch.minecraftacademy.room.InvitationManager;
+import net.st1ch.minecraftacademy.room.RoomManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +27,13 @@ public class MinecraftAcademy implements ModInitializer {
 	public static final String MOD_ID = "minecraft-academy";
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
+	public static String secret = "miencraftacademysuperkey";
+	public static UserRoleManager userRoleManager = new UserRoleManager();
+	public static RoomManager roomManager = new RoomManager();
+	public static InvitationManager invitationManager = new InvitationManager();
+	public static UserManager userManager = new UserManager(secret);
+
 
 	@Override
 	public void onInitialize() {
@@ -27,10 +44,16 @@ public class MinecraftAcademy implements ModInitializer {
 
 		ModItems.registerModItems();
 		ModEntities.registerModEntities();
-		ModEvents.registerModEvents();
+		ModEvents.registerModEvents(invitationManager, userManager, userRoleManager, roomManager);
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-			ModCommands.register(dispatcher);
+			RemoveRobots.register(dispatcher);
+			InviteCommand.register(dispatcher, invitationManager, userManager, userRoleManager);
+			AcceptCommand.register(dispatcher, invitationManager, userManager, userRoleManager, roomManager);
+			DenyCommand.register(dispatcher, invitationManager, userManager);
+			CreateRoomCommand.register(dispatcher, roomManager, userManager, userRoleManager);
+			GetTokenCommand.register(dispatcher, userManager);
+			LeaveRoomCommand.register(dispatcher, userManager, roomManager, userRoleManager);
 		});
 
 		FabricDefaultAttributeRegistry.register(ModEntities.ROBOT, RobotEntity.createRobotAttributes());

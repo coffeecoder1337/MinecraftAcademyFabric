@@ -36,6 +36,10 @@ public class Room {
         participants.put(playerUuid, role);
     }
 
+    public void removeParticipant(UUID token) {
+        participants.remove(token);
+    }
+
     public Role getRole(UUID playerUuid) {
         return participants.getOrDefault(playerUuid, Role.OBSERVER);
     }
@@ -47,5 +51,7 @@ public class Room {
     public Map<UUID, Role> getParticipants() {
         return participants;
     }
+
+
 }
 

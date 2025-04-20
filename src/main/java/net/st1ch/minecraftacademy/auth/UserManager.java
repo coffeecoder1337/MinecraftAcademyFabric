@@ -1,36 +1,46 @@
 package net.st1ch.minecraftacademy.auth;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class UserManager {
-    private final Map<String, User> usersByHash = new HashMap<>();
+    private final Map<UUID, User> users = new HashMap<>();
+    private final String secretKey;
 
-    public User getOrCreateUser(String username, String ipAddress) {
-        String hash = hash(username + ipAddress);
-        return usersByHash.computeIfAbsent(hash, h -> new User(username, h));
+    public UserManager(String secretKey) {
+        this.secretKey = secretKey;
     }
 
-    public User getByToken(UUID token) {
-        return usersByHash.values().stream()
-                .filter(u -> u.getToken().equals(token))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private String hash(String input) {
+    public UUID generateUUID(String name, String ip) {
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] encodedHash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
-            StringBuilder hex = new StringBuilder();
-            for (byte b : encodedHash) hex.append(String.format("%02x", b));
-            return hex.toString();
+            String input = name + ip;
+            Mac hmac = Mac.getInstance("HmacSHA256");
+            SecretKeySpec key = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+            hmac.init(key);
+            byte[] hash = hmac.doFinal(input.getBytes(StandardCharsets.UTF_8));
+            return UUID.nameUUIDFromBytes(hash);  // для преобразования в UUID
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public User registerOrGetUser(String name, String ip) {
+        UUID id = generateUUID(name, ip);
+        return users.computeIfAbsent(id, u -> new User(name, u));
+    }
+
+    public User getByUUID(UUID id) {
+        return users.get(id);
+    }
+
+    public Collection<User> getAllOnlineUsers() {
+        return users.values().stream().filter(User::isOnline).toList();
     }
 }
 
