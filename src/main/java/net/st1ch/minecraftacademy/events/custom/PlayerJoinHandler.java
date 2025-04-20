@@ -16,8 +16,8 @@ public class PlayerJoinHandler {
 
             User user = userManager.registerOrGetUser(name, ip);
             user.setOnline(true);
+            user.sendTokenMessage(player);
 
-            player.sendMessage(Text.literal("Ваш токен: " + user.getToken()));
         });
     }
 }
