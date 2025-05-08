@@ -5,8 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.text.Text;
 import net.st1ch.minecraftacademy.auth.Role;
 import net.st1ch.minecraftacademy.auth.UserManager;
 import net.st1ch.minecraftacademy.auth.UserRoleManager;
@@ -38,11 +37,15 @@ public class CreateRoomCommand {
                             String typeStr = StringArgumentType.getString(ctx, "type").toUpperCase();
                             RoomType type = RoomType.valueOf(typeStr);
 
-                            // Box должна быть рассчитана по позиции игрока или случайно (тут placeholder)
-                            Box roomBox = new Box(player.getBlockPos()).offset(new Vec3d(0, 10, 0)).expand(10);
-                            Room room = roomManager.createRoom(player, type, roomBox);
+                            String currentPlayerRoomID = roleManager.getRoom(token);
 
-                            roomService.joinRoom(player, token, room.getId(), Role.ADMIN, roomManager, roleManager);
+                            if (currentPlayerRoomID != null) {
+                                player.sendMessage(Text.literal("Покиньте текущую комнату для создания новой."));
+                                return 0;
+                            }
+
+                            Room room = roomManager.createRoom(player, type);
+                            roomService.joinRoom(player, token, room.getId(), Role.ADMIN);
 
                             return 1;
                         })));

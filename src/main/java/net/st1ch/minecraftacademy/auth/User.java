@@ -1,6 +1,5 @@
 package net.st1ch.minecraftacademy.auth;
 
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
@@ -13,15 +12,21 @@ public class User {
     private final String name;
     private final UUID token;
     private boolean online;
+    private final ServerPlayerEntity player;
 
-    public User(String name, UUID token) {
+    public User(String name, UUID token, ServerPlayerEntity player) {
         this.name = name;
         this.token = token;
         this.online = true;
+        this.player = player;
     }
 
     public UUID getToken() {
         return token;
+    }
+
+    public ServerPlayerEntity getPlayer() {
+        return this.player;
     }
 
     private Text getTokenText() {

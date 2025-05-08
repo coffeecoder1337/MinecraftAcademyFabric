@@ -1,5 +1,7 @@
 package net.st1ch.minecraftacademy.auth;
 
+import net.minecraft.server.network.ServerPlayerEntity;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
@@ -30,9 +32,9 @@ public class UserManager {
         }
     }
 
-    public User registerOrGetUser(String name, String ip) {
+    public User registerOrGetUser(String name, String ip, ServerPlayerEntity player) {
         UUID id = generateUUID(name, ip);
-        return users.computeIfAbsent(id, u -> new User(name, u));
+        return users.computeIfAbsent(id, u -> new User(name, u, player));
     }
 
     public User getByUUID(UUID id) {

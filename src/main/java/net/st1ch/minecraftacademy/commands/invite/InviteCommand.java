@@ -24,8 +24,11 @@ public class InviteCommand {
         dispatcher.register(CommandManager.literal("invite")
                 .then(CommandManager.argument("player", StringArgumentType.word())
                         .suggests((ctx, builder) -> {
+                            ServerPlayerEntity inviter = ctx.getSource().getPlayer();
+                            User inviterUser = userManager.registerOrGetUser(inviter.getName().getString(), inviter.getIp(), inviter);
+
                             for (User u : userManager.getAllOnlineUsers()) {
-                                builder.suggest(u.getName());
+                                if (u != inviterUser) builder.suggest(u.getName());
                             }
                             return builder.buildFuture();
                         })
@@ -50,6 +53,11 @@ public class InviteCommand {
 
                                     UUID inviterId = userManager.generateUUID(inviter.getName().getString(), inviter.getIp());
                                     UUID targetId = userManager.generateUUID(target.getName().getString(), target.getIp());
+
+                                    if (inviterId.equals(targetId)) {
+                                        inviter.sendMessage(Text.literal("Вы не можете пригласить себя."));
+                                        return 0;
+                                    }
 
                                     String roomId = userRoleManager.getRoom(inviterId);
                                     if (roomId == null) {

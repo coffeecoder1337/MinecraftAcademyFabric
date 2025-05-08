@@ -29,7 +29,7 @@ public class LeaveRoomCommand {
                     String ip = player.getIp();
                     UUID token = userManager.generateUUID(name, ip);
 
-                    roomService.leaveRoom(player, token, roomManager, roleManager);
+                    roomService.leaveRoom(player, token);
 
                     return 1;
                 }));

@@ -32,7 +32,7 @@ public class MinecraftAcademy implements ModInitializer {
 	public static RoomManager roomManager = new RoomManager();
 	public static InvitationManager invitationManager = new InvitationManager();
 	public static UserManager userManager = new UserManager(secret);
-	public static RoomService roomService = new RoomService();
+	public static RoomService roomService = new RoomService(roomManager, userRoleManager, userManager);
 	public static PlacedBlockManager placedBlockManager = new PlacedBlockManager();
 	public static RoomBlockAccessController blockAccessController = new RoomBlockAccessController(
 			placedBlockManager,

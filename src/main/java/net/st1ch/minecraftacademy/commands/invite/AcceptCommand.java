@@ -34,7 +34,14 @@ public class AcceptCommand {
                     PendingInvitation invite = invitationManager.get(token);
                     Room room = roomManager.getRoom(invite.getRoomId());
 
-                    roomService.joinRoom(player, token, room.getId(), invite.getRole(), roomManager, roleManager);
+                    String currentPlayerRoomID = roleManager.getRoom(token);
+                    Room currentPlayerRoom = roomManager.getRoom(currentPlayerRoomID);
+                    if (currentPlayerRoom != null) {
+                        roomService.leaveRoom(player, token);
+                    }
+
+
+                    roomService.joinRoom(player, token, room.getId(), invite.getRole());
 
                     return 1;
                 }));
