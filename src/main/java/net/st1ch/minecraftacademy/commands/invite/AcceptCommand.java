@@ -19,7 +19,8 @@ public class AcceptCommand {
                                 InvitationManager invitationManager,
                                 UserManager userManager,
                                 UserRoleManager roleManager,
-                                RoomManager roomManager) {
+                                RoomManager roomManager,
+                                RoomService roomService) {
         dispatcher.register(CommandManager.literal("accept")
                 .executes(ctx -> {
                     ServerPlayerEntity player = ctx.getSource().getPlayer();
@@ -33,7 +34,7 @@ public class AcceptCommand {
                     PendingInvitation invite = invitationManager.get(token);
                     Room room = roomManager.getRoom(invite.getRoomId());
 
-                    RoomService.joinRoom(player, token, room.getId(), invite.getRole(), roomManager, roleManager);
+                    roomService.joinRoom(player, token, room.getId(), invite.getRole(), roomManager, roleManager);
 
                     return 1;
                 }));

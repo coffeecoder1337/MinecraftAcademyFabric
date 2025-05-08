@@ -18,8 +18,7 @@ import net.st1ch.minecraftacademy.entity.custom.robot.RobotEntity;
 import net.st1ch.minecraftacademy.events.ModEvents;
 import net.st1ch.minecraftacademy.item.ModItems;
 import net.st1ch.minecraftacademy.network.UDPServer;
-import net.st1ch.minecraftacademy.room.InvitationManager;
-import net.st1ch.minecraftacademy.room.RoomManager;
+import net.st1ch.minecraftacademy.room.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +32,13 @@ public class MinecraftAcademy implements ModInitializer {
 	public static RoomManager roomManager = new RoomManager();
 	public static InvitationManager invitationManager = new InvitationManager();
 	public static UserManager userManager = new UserManager(secret);
+	public static RoomService roomService = new RoomService();
+	public static PlacedBlockManager placedBlockManager = new PlacedBlockManager();
+	public static RoomBlockAccessController blockAccessController = new RoomBlockAccessController(
+			placedBlockManager,
+			roomManager,
+			userManager,
+			userRoleManager);
 
 
 	@Override
@@ -44,16 +50,16 @@ public class MinecraftAcademy implements ModInitializer {
 
 		ModItems.registerModItems();
 		ModEntities.registerModEntities();
-		ModEvents.registerModEvents(invitationManager, userManager, userRoleManager, roomManager);
+		ModEvents.registerModEvents(invitationManager, userManager, userRoleManager, roomManager, blockAccessController);
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			RemoveRobots.register(dispatcher);
 			InviteCommand.register(dispatcher, invitationManager, userManager, userRoleManager);
-			AcceptCommand.register(dispatcher, invitationManager, userManager, userRoleManager, roomManager);
+			AcceptCommand.register(dispatcher, invitationManager, userManager, userRoleManager, roomManager, roomService);
 			DenyCommand.register(dispatcher, invitationManager, userManager);
-			CreateRoomCommand.register(dispatcher, roomManager, userManager, userRoleManager);
+			CreateRoomCommand.register(dispatcher, roomManager, userManager, userRoleManager, roomService);
 			GetTokenCommand.register(dispatcher, userManager);
-			LeaveRoomCommand.register(dispatcher, userManager, roomManager, userRoleManager);
+			LeaveRoomCommand.register(dispatcher, userManager, roomManager, userRoleManager, roomService);
 		});
 
 		FabricDefaultAttributeRegistry.register(ModEntities.ROBOT, RobotEntity.createRobotAttributes());

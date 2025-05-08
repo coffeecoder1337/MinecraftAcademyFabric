@@ -1,5 +1,6 @@
 package net.st1ch.minecraftacademy.room;
 
+import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -9,11 +10,13 @@ import net.minecraft.util.math.Vec3d;
 import net.st1ch.minecraftacademy.auth.Role;
 import net.st1ch.minecraftacademy.auth.UserRoleManager;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 public class RoomService {
+    private final HashMap<UUID, Vec3d> playerPosition = new HashMap<>();
 
-    public static void joinRoom(ServerPlayerEntity player, UUID token, String roomId, Role role,
+    public void joinRoom(ServerPlayerEntity player, UUID token, String roomId, Role role,
                                 RoomManager roomManager, UserRoleManager roleManager) {
         Room room = roomManager.getRoom(roomId);
         if (room == null) {
@@ -25,6 +28,8 @@ public class RoomService {
         roleManager.assignRole(token, role);
         room.addParticipant(token, role);
 
+        this.playerPosition.put(token, player.getPos());
+
         // Телепортировать в комнату
         Vec3d center = room.getBounds().getCenter();
         player.teleport(player.getServerWorld(), center.getX(), center.getY() + 1, center.getZ(), 0, 0);
@@ -35,7 +40,7 @@ public class RoomService {
         player.sendMessage(Text.literal("Вы присоединились к комнате " + roomId + " как " + role.name()));
     }
 
-    public static void leaveRoom(ServerPlayerEntity player, UUID token,
+    public void leaveRoom(ServerPlayerEntity player, UUID token,
                                  RoomManager roomManager, UserRoleManager roleManager) {
         String roomId = roleManager.getRoom(token);
         if (roomId == null) {
@@ -44,15 +49,22 @@ public class RoomService {
         }
 
         Room room = roomManager.getRoom(roomId);
-        if (room != null) room.removeParticipant(token);
+        if (room != null) {
+            room.removeParticipant(token);
+            if (room.getParticipants().isEmpty()) {
+                room.destroyRoom(player);
+                roomManager.removeRoom(room.getId());
+            }
+        }
 
         roleManager.clear(token);
 
         // Очистка блоков
         clearWoolBlocks(player);
 
-        // Телепорт на спавн
-        BlockPos spawn = player.getServerWorld().getSpawnPos();
+
+        // Телепорт обратно
+        Vec3d spawn = this.playerPosition.remove(token);
         player.teleport(player.getServerWorld(), spawn.getX(), spawn.getY(), spawn.getZ(), 0, 0);
 
         player.sendMessage(Text.literal("Вы покинули комнату " + roomId));

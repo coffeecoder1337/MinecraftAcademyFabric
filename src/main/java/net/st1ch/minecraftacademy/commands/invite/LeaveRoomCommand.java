@@ -19,7 +19,8 @@ public class LeaveRoomCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
                                 UserManager userManager,
                                 RoomManager roomManager,
-                                UserRoleManager roleManager) {
+                                UserRoleManager roleManager,
+                                RoomService roomService) {
 
         dispatcher.register(CommandManager.literal("leave_room")
                 .executes(ctx -> {
@@ -28,7 +29,7 @@ public class LeaveRoomCommand {
                     String ip = player.getIp();
                     UUID token = userManager.generateUUID(name, ip);
 
-                    RoomService.leaveRoom(player, token, roomManager, roleManager);
+                    roomService.leaveRoom(player, token, roomManager, roleManager);
 
                     return 1;
                 }));
