@@ -10,7 +10,13 @@ import java.util.Map;
 import java.util.UUID;
 
 public class RoomManager {
+    private static RoomManager instance;
     private final Map<String, Room> rooms = new HashMap<>();
+
+    public static RoomManager getInstance() {
+        if (instance == null) instance = new RoomManager();
+        return instance;
+    }
 
     public Box generateRoomBoundsSpiral(
             Collection<Room> existingRooms,
@@ -106,6 +112,14 @@ public class RoomManager {
             if (room.isRoomBlock(pos)) return true;
         }
         return false;
+    }
+
+    public Room getRoomByPosition(BlockPos pos) {
+        for (Map.Entry<String, Room> entry: rooms.entrySet()){
+            Room room = entry.getValue();
+            if (room.isRoomBlock(pos)) return room;
+        }
+        return null;
     }
 
 }

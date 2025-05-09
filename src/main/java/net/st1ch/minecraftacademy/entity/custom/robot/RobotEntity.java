@@ -26,7 +26,6 @@ public class RobotEntity extends PathAwareEntity {
 
     public RobotEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
-        UDPServer.registerRobot(this.getUuidAsString(), this);
     }
 
     public static DefaultAttributeContainer.Builder createRobotAttributes() {
@@ -79,10 +78,10 @@ public class RobotEntity extends PathAwareEntity {
         if (!this.isOnGround()) {
             this.setVelocity(this.getVelocity().add(0, -0.04, 0)); // gravity
         } else {
-            // rotating with some speed
+            // поворот со скоростью
             float newYaw = this.getYaw() + (float) this.rotationSpeed;
 
-            // Normalize the yaw to ensure it stays within [-180, 180]
+            // Нормализация yaw в пределах [-180, 180]
             if (newYaw > 180.0F) {
                 newYaw -= 360.0F;
             } else if (newYaw < -180.0F) {
@@ -116,3 +115,11 @@ public class RobotEntity extends PathAwareEntity {
     }
 }
 
+//// Спавним робота рядом с игроком
+//CustomRobotEntity robot = new CustomRobotEntity(ModEntities.ROBOT, world);
+//robot.refreshPositionAndAngles(spawnPos.getX() + 2, spawnPos.getY(), spawnPos.getZ() + 2, 0, 0);
+//world.spawnEntity(robot);
+//
+//// Отправляем сообщение в чат с ID робота
+//player.sendMessage(Text.of("Ваш робот создан! ID: " + robot.getUuidAsString()), false);
+//

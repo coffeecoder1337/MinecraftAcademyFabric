@@ -10,6 +10,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.st1ch.minecraftacademy.auth.UserManager;
 import net.st1ch.minecraftacademy.auth.UserRoleManager;
+import net.st1ch.minecraftacademy.entity.custom.robot.RobotSpawner;
 import net.st1ch.minecraftacademy.room.*;
 
 import java.util.UUID;
@@ -42,6 +43,7 @@ public class AcceptCommand {
 
 
                     roomService.joinRoom(player, token, room.getId(), invite.getRole());
+                    RobotSpawner.spawnForPlayer(player, token, room);
 
                     return 1;
                 }));

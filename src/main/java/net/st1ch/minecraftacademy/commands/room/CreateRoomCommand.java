@@ -9,6 +9,7 @@ import net.minecraft.text.Text;
 import net.st1ch.minecraftacademy.auth.Role;
 import net.st1ch.minecraftacademy.auth.UserManager;
 import net.st1ch.minecraftacademy.auth.UserRoleManager;
+import net.st1ch.minecraftacademy.entity.custom.robot.RobotSpawner;
 import net.st1ch.minecraftacademy.room.Room;
 import net.st1ch.minecraftacademy.room.RoomManager;
 import net.st1ch.minecraftacademy.room.RoomService;
@@ -46,6 +47,7 @@ public class CreateRoomCommand {
 
                             Room room = roomManager.createRoom(player, type);
                             roomService.joinRoom(player, token, room.getId(), Role.ADMIN);
+                            RobotSpawner.spawnForPlayer(player, token, room);
 
                             return 1;
                         })));

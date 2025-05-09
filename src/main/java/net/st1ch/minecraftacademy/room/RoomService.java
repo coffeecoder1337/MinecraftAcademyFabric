@@ -65,6 +65,7 @@ public class RoomService {
         Room room = roomManager.getRoom(roomId);
 
         room.removeParticipant(token);
+        room.removeRobot(token);
 
         if (role == Role.ADMIN) {
             Collection<Role> allRoomRoles = room.getParticipants().values();

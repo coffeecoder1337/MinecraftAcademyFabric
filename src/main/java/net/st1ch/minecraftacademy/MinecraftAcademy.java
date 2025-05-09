@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.st1ch.minecraftacademy.auth.UserManager;
 import net.st1ch.minecraftacademy.auth.UserRoleManager;
+import net.st1ch.minecraftacademy.blocks.ModBlocks;
 import net.st1ch.minecraftacademy.commands.entity.robot.RemoveRobots;
 import net.st1ch.minecraftacademy.commands.invite.AcceptCommand;
 import net.st1ch.minecraftacademy.commands.invite.DenyCommand;
@@ -29,7 +30,7 @@ public class MinecraftAcademy implements ModInitializer {
 
 	public static String secret = "miencraftacademysuperkey";
 	public static UserRoleManager userRoleManager = new UserRoleManager();
-	public static RoomManager roomManager = new RoomManager();
+	public static RoomManager roomManager = RoomManager.getInstance();
 	public static InvitationManager invitationManager = new InvitationManager();
 	public static UserManager userManager = new UserManager(secret);
 	public static RoomService roomService = new RoomService(roomManager, userRoleManager, userManager);
@@ -50,6 +51,7 @@ public class MinecraftAcademy implements ModInitializer {
 
 		ModItems.registerModItems();
 		ModEntities.registerModEntities();
+		ModBlocks.registerModBlocks();
 		ModEvents.registerModEvents(invitationManager, userManager, userRoleManager, roomManager, blockAccessController);
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
