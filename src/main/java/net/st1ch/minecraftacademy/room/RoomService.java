@@ -9,6 +9,7 @@ import net.st1ch.minecraftacademy.auth.Role;
 import net.st1ch.minecraftacademy.auth.User;
 import net.st1ch.minecraftacademy.auth.UserManager;
 import net.st1ch.minecraftacademy.auth.UserRoleManager;
+import net.st1ch.minecraftacademy.entity.custom.robot.RobotSpawner;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ public class RoomService {
 
         roleManager.assignRoom(token, roomId);
         roleManager.assignRole(token, role);
-        room.addParticipant(token, role);
+        room.addParticipant(token, player.getGameProfile().getId(), role);
 
         this.playerPosition.put(token, player.getPos());
 
@@ -50,6 +51,9 @@ public class RoomService {
 
         // Выдать блоки
         giveStarterBlocks(player);
+
+        // Если у игрока нет робота то создать робота и привязать его к игроку
+        if (room.getRobotByPlayer(token) == null) RobotSpawner.spawnForPlayer(player, token, room);
 
         player.sendMessage(Text.literal("Вы присоединились к комнате " + roomId + " как " + role.name()));
     }
@@ -64,7 +68,7 @@ public class RoomService {
         Role role = roleManager.getRole(token);
         Room room = roomManager.getRoom(roomId);
 
-        room.removeParticipant(token);
+        room.removeParticipant(token, player.getGameProfile().getId());
         room.removeRobot(token);
 
         if (role == Role.ADMIN) {

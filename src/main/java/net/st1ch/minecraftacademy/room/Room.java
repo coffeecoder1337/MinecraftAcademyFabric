@@ -19,6 +19,7 @@ public class Room {
     private final RoomType type;
     private final Box bounds;
     private final Map<UUID, Role> participants;
+    private final Collection<UUID> participantsUUIDs;
     private final List<BlockPos> wallBlocks;
     private boolean globalControlAllowed = true;
     private final Set<UUID> individuallyAllowed = new HashSet<>();
@@ -31,6 +32,7 @@ public class Room {
         this.type = type;
         this.bounds = bounds;
         this.participants = new HashMap<>();
+        this.participantsUUIDs = new ArrayList<>();
         this.wallBlocks = new ArrayList<BlockPos>();
         this.robotSpawnBlock = null;
     }
@@ -61,8 +63,8 @@ public class Room {
                             y == min.getY() || y == max.getY() - 1 ||
                             z == min.getZ() || z == max.getZ() - 1;
 
-                    boolean isFloor = (min.getX() + 1 < x && x < max.getX() - 1) &&
-                            (min.getZ() + 1 < z && z < max.getZ() - 1) &&
+                    boolean isFloor = (min.getX() + 1 < x && x < max.getX()) &&
+                            (min.getZ() + 1 < z && z < max.getZ()) &&
                             (y == min.getY() + 1);
 
                     Vec3d center = bounds.getCenter();
@@ -106,13 +108,16 @@ public class Room {
         return this.getBounds().contains(Vec3d.ofCenter(pos));
     }
 
-    public void addParticipant(UUID playerUuid, Role role) {
-        participants.put(playerUuid, role);
+    public void addParticipant(UUID token, UUID playerUuid, Role role) {
+        participants.put(token, role);
+        participantsUUIDs.add(playerUuid);
     }
 
-    public void removeParticipant(UUID token) {
+    public void removeParticipant(UUID token, UUID uuid) {
         participants.remove(token);
+        participantsUUIDs.remove(uuid);
     }
+
 
     public Role getRole(UUID playerUuid) {
         return participants.getOrDefault(playerUuid, Role.OBSERVER);
@@ -124,6 +129,10 @@ public class Room {
 
     public Map<UUID, Role> getParticipants() {
         return participants;
+    }
+
+    public Collection<UUID> getParticipantsUUIDs() {
+        return participantsUUIDs;
     }
 
     public void assignRobotToPlayer(UUID token, RobotEntity robot) {
@@ -175,20 +184,17 @@ public class Room {
         }
     }
 
-    public boolean canRun(UUID userId) {
-        return globalControlAllowed || individuallyAllowed.contains(userId);
+    public boolean canRun(UUID token) {
+        return globalControlAllowed || individuallyAllowed.contains(token);
     }
 
     public void setGlobalControlAllowed(boolean allowed) {
         globalControlAllowed = allowed;
     }
 
-    public void allowUser(UUID userId) {
-        individuallyAllowed.add(userId);
-    }
-
-    public void disallowUser(UUID userId) {
-        individuallyAllowed.remove(userId);
+    public void setUserCanRun(UUID token, boolean value) {
+        if (value) individuallyAllowed.add(token);
+        else individuallyAllowed.remove(token);
     }
 
     public Collection<RobotEntity> getAllRobots() {

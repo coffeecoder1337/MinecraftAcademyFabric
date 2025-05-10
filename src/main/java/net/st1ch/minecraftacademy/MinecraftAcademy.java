@@ -7,11 +7,14 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRe
 import net.st1ch.minecraftacademy.auth.UserManager;
 import net.st1ch.minecraftacademy.auth.UserRoleManager;
 import net.st1ch.minecraftacademy.blocks.ModBlocks;
+import net.st1ch.minecraftacademy.commands.entity.HideEntityCommand;
+import net.st1ch.minecraftacademy.commands.entity.ShowEntityCommand;
 import net.st1ch.minecraftacademy.commands.entity.robot.RemoveRobots;
 import net.st1ch.minecraftacademy.commands.invite.AcceptCommand;
 import net.st1ch.minecraftacademy.commands.invite.DenyCommand;
 import net.st1ch.minecraftacademy.commands.invite.InviteCommand;
 import net.st1ch.minecraftacademy.commands.invite.LeaveRoomCommand;
+import net.st1ch.minecraftacademy.commands.room.AllowRunCommand;
 import net.st1ch.minecraftacademy.commands.room.CreateRoomCommand;
 import net.st1ch.minecraftacademy.commands.user.GetTokenCommand;
 import net.st1ch.minecraftacademy.entity.ModEntities;
@@ -29,7 +32,7 @@ public class MinecraftAcademy implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	public static String secret = "miencraftacademysuperkey";
-	public static UserRoleManager userRoleManager = new UserRoleManager();
+	public static UserRoleManager userRoleManager = UserRoleManager.getInstance();
 	public static RoomManager roomManager = RoomManager.getInstance();
 	public static InvitationManager invitationManager = new InvitationManager();
 	public static UserManager userManager = new UserManager(secret);
@@ -62,6 +65,10 @@ public class MinecraftAcademy implements ModInitializer {
 			CreateRoomCommand.register(dispatcher, roomManager, userManager, userRoleManager, roomService);
 			GetTokenCommand.register(dispatcher, userManager);
 			LeaveRoomCommand.register(dispatcher, userManager, roomManager, userRoleManager, roomService);
+			AllowRunCommand.register(dispatcher, userManager, userRoleManager);
+			HideEntityCommand.register(dispatcher, userManager, userRoleManager);
+			ShowEntityCommand.register(dispatcher, userManager, userRoleManager);
+
 		});
 
 		FabricDefaultAttributeRegistry.register(ModEntities.ROBOT, RobotEntity.createRobotAttributes());

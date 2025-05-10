@@ -2,12 +2,16 @@ package net.st1ch.minecraftacademy.network;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import net.st1ch.minecraftacademy.auth.UserRoleManager;
 import net.st1ch.minecraftacademy.entity.custom.robot.RobotEntity;
+import net.st1ch.minecraftacademy.room.Room;
+import net.st1ch.minecraftacademy.room.RoomManager;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UDPServer {
@@ -38,7 +42,13 @@ public class UDPServer {
 
                     if (robots.containsKey(id)) {
                         RobotEntity robot = robots.get(id);
-                        robot.setMovement(rotationSpeed, moveSpeed);
+                        UUID token = UUID.fromString(id);
+                        System.out.println("id " + id + " converted to token " + token);
+                        String roomId = UserRoleManager.getInstance().getRoom(token);
+                        Room room = RoomManager.getInstance().getRoom(roomId);
+                        if (room.canRun(token)) {
+                            robot.setMovement(rotationSpeed, moveSpeed);
+                        }
                     }
                 } catch (Exception e) {
                     System.err.println("Ошибка обработки JSON: " + e.getMessage());

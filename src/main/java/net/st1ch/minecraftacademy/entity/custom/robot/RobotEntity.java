@@ -21,6 +21,13 @@ public class RobotEntity extends PathAwareEntity {
     // params
     private double rotationSpeed = 0;
     private double moveSpeed = 0;
+
+    private final double MAX_MOVESPEED = 0.15;
+    private final double MIN_MOVESPEED = 0;
+
+    private final double MAX_ROTATIONSPEED = 5;
+    private final double MIN_ROTATIONSPEED = -5;
+
     public RobotSensors sensors = new RobotSensors(this);
     private int printSensorsTimeout = 40;
 
@@ -43,9 +50,25 @@ public class RobotEntity extends PathAwareEntity {
         }
     }
 
+    public double strict(double number, double low, double max) {
+        if (number > max) return max;
+        else if (number < low) return low;
+        else return number;
+    }
+
+    public double normalize(double number, double from_low, double from_high, double to_low, double to_high) {
+        return to_low + (number - from_low) * (to_high - to_low) / (from_high - from_low);
+    }
+
     public void setMovement(double rotationSpeed, double moveSpeed) {
-        this.rotationSpeed = rotationSpeed;
-        this.moveSpeed = moveSpeed;
+        double strictedRotationSpeed = strict(rotationSpeed, -100, 100);
+        double strictedMoveSpeed = strict(moveSpeed, 0, 100);
+
+        double normalizedRotationSpeed = normalize(strictedRotationSpeed, -100, 100, MIN_ROTATIONSPEED, MAX_ROTATIONSPEED);
+        double normalizedMoveSpeed = normalize(strictedMoveSpeed, 0, 100, MIN_MOVESPEED, MAX_MOVESPEED);
+
+        this.rotationSpeed = normalizedRotationSpeed;
+        this.moveSpeed = normalizedMoveSpeed;
     }
 
     public void sendRobotIdToChat(PlayerEntity player, String robotId) {
@@ -109,8 +132,8 @@ public class RobotEntity extends PathAwareEntity {
 //            this.setupAnimationStates();
         } else {
             this.move();
-            if (printSensorsTimeout <= 0) { System.out.println(this.sensors.getSensorData()); printSensorsTimeout=40; }
-            else --printSensorsTimeout;
+//            if (printSensorsTimeout <= 0) { System.out.println(this.sensors.getSensorData()); printSensorsTimeout=40; }
+//            else --printSensorsTimeout;
         }
     }
 }

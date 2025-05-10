@@ -43,7 +43,6 @@ public class AcceptCommand {
 
 
                     roomService.joinRoom(player, token, room.getId(), invite.getRole());
-                    RobotSpawner.spawnForPlayer(player, token, room);
 
                     return 1;
                 }));

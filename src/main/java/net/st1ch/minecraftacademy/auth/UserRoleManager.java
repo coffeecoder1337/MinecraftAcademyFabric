@@ -5,9 +5,15 @@ import java.util.Map;
 import java.util.UUID;
 
 public class UserRoleManager {
+    private static UserRoleManager instance;
     private final Map<UUID, Role> userRoles = new HashMap<>();
     private final Map<UUID, String> userRooms = new HashMap<>();
     private final Map<UUID, UUID> userRobots = new HashMap<>();
+
+    public static UserRoleManager getInstance() {
+        if (instance == null) instance = new UserRoleManager();
+        return instance;
+    }
 
     public void assignRole(UUID userToken, Role role) {
         userRoles.put(userToken, role);

@@ -1,0 +1,103 @@
+package net.st1ch.minecraftacademy.commands.entity;
+
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.st1ch.minecraftacademy.auth.Role;
+import net.st1ch.minecraftacademy.auth.User;
+import net.st1ch.minecraftacademy.auth.UserManager;
+import net.st1ch.minecraftacademy.auth.UserRoleManager;
+import net.st1ch.minecraftacademy.entity.client.HiddenEntityManager;
+import net.st1ch.minecraftacademy.entity.custom.robot.RobotEntity;
+import net.st1ch.minecraftacademy.room.Room;
+import net.st1ch.minecraftacademy.room.RoomManager;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
+
+public class ShowEntityCommand {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
+                                UserManager userManager,
+                                UserRoleManager userRoleManager) {
+
+        dispatcher.register(CommandManager.literal("show")
+                .then(CommandManager.argument("target_type", StringArgumentType.word())
+                        .suggests((ctx, builder) -> {
+                            builder.suggest("robot");
+                            builder.suggest("player");
+                            return builder.buildFuture();
+                        })
+                        .then(CommandManager.argument("target", StringArgumentType.word())
+                                .suggests((ctx, builder) -> {
+                                    ServerPlayerEntity inviter = ctx.getSource().getPlayer();
+
+                                    User inviterUser = userManager.registerOrGetUser(inviter.getName().getString(), inviter.getIp(), inviter);
+                                    String roomId = userRoleManager.getRoom(inviterUser.getToken());
+                                    Room room = RoomManager.getInstance().getRoom(roomId);
+                                    Map<UUID, Role> users = room.getParticipants();
+
+                                    builder.suggest("all");
+                                    for (UUID u: users.keySet()) {
+                                        builder.suggest(userManager.getByUUID(u).getName());
+                                    }
+
+                                    return builder.buildFuture();
+                                })
+                                .executes(ctx -> {
+                                    ServerPlayerEntity inviter = ctx.getSource().getPlayer();
+                                    String targetType = StringArgumentType.getString(ctx, "target_type").toLowerCase();
+                                    String targetName = StringArgumentType.getString(ctx, "target");
+
+                                    if (!targetType.equals("robot") && !targetType.equals("player")) {
+                                        inviter.sendMessage(Text.literal("Неверное значение параметра. Укажите robot или player."));
+                                        return 0;
+                                    }
+
+                                    UUID inviterId = userManager.generateUUID(inviter.getName().getString(), inviter.getIp());
+                                    String roomId = userRoleManager.getRoom(inviterId);
+
+                                    if (roomId == null) {
+                                        inviter.sendMessage(Text.literal("Вы не находитесь в комнате."));
+                                        return 0;
+                                    }
+                                    Room room = RoomManager.getInstance().getRoom(roomId);
+
+
+                                    if (targetName.equals("all")) {
+                                        if (targetType.equals("player")) {
+                                            HiddenEntityManager.showAllPlayers();
+                                            inviter.sendMessage(Text.literal("Пользователи отображены."));
+                                        } else {
+                                            HiddenEntityManager.showAllRobots();
+                                            inviter.sendMessage(Text.literal("Роботы отображены."));
+                                        }
+                                        return 1;
+                                    }
+
+                                    ServerPlayerEntity target = ctx.getSource().getServer().getPlayerManager().getPlayer(targetName);
+                                    if (target == null) {
+                                        inviter.sendMessage(Text.literal("Игрок не найден."));
+                                        return 0;
+                                    }
+
+//                                    UUID targetToken = userManager.generateUUID(target.getName().getString(), target.getIp());
+
+                                    if (targetType.equals("player")) {
+                                        HiddenEntityManager.showPlayer(target.getGameProfile().getId());
+                                        inviter.sendMessage(Text.literal("Пользователь отображен."));
+                                    } else {
+                                        HiddenEntityManager.showRobot(target.getGameProfile().getId());
+                                        inviter.sendMessage(Text.literal("Робот отображен."));
+                                    }
+
+                                    return 1;
+                                }))));
+    }
+}
+
+
+
