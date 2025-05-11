@@ -21,10 +21,13 @@ import net.st1ch.minecraftacademy.entity.ModEntities;
 import net.st1ch.minecraftacademy.entity.custom.robot.RobotEntity;
 import net.st1ch.minecraftacademy.events.ModEvents;
 import net.st1ch.minecraftacademy.item.ModItems;
+import net.st1ch.minecraftacademy.network.UDPManager;
 import net.st1ch.minecraftacademy.network.UDPServer;
 import net.st1ch.minecraftacademy.room.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.SocketException;
 
 public class MinecraftAcademy implements ModInitializer {
 	public static final String MOD_ID = "minecraft-academy";
@@ -44,13 +47,23 @@ public class MinecraftAcademy implements ModInitializer {
 			userManager,
 			userRoleManager);
 
+	public static final UDPManager udpManager;
 
-	@Override
+    static {
+        try {
+            udpManager = new UDPManager();
+        } catch (SocketException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
 	public void onInitialize() {
 
 		LOGGER.info("Hello Fabric world!");
 
-		new Thread(UDPServer::startServer).start();
+//		new Thread(UDPServer::startServer).start();
+		udpManager.start();
 
 		ModItems.registerModItems();
 		ModEntities.registerModEntities();

@@ -6,6 +6,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.st1ch.minecraftacademy.MinecraftAcademy;
 import net.st1ch.minecraftacademy.entity.ModEntities;
 import net.st1ch.minecraftacademy.network.UDPServer;
 import net.st1ch.minecraftacademy.room.Room;
@@ -28,8 +29,8 @@ public class RobotSpawner {
         robot.setHeadYaw(yaw);
         robot.setBodyYaw(yaw);
 
-        UDPServer.registerRobot(token.toString(), robot);
-
+//        UDPServer.registerRobot(token.toString(), robot);
+        MinecraftAcademy.udpManager.registerRobot(token, robot);
         world.spawnEntity(robot);
         room.assignRobotToPlayer(token, robot);
     }

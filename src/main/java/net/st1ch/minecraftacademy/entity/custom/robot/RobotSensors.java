@@ -1,6 +1,7 @@
 package net.st1ch.minecraftacademy.entity.custom.robot;
 
 
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -41,14 +42,13 @@ public class RobotSensors {
 //        this.clientPort = clientPort;
     }
 
-    public String getSensorData() {
+    public Map<String, Object> getSensorData() {
         Map<String, Object> data = new HashMap<>();
         data.put("distance_sensors", getDistanceSensors());
         data.put("lidar_2d", getLidar2D());
         data.put("lidar_3d", getLidar3D());
         data.put("color", getColorSensor());
-        String json = new com.google.gson.Gson().toJson(data);
-        return json;
+        return data;
 //        sendJson(data);
     }
 

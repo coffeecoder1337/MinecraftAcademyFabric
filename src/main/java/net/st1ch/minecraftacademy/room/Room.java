@@ -1,5 +1,6 @@
 package net.st1ch.minecraftacademy.room;
 
+import com.google.gson.Gson;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -8,9 +9,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.st1ch.minecraftacademy.MinecraftAcademy;
 import net.st1ch.minecraftacademy.auth.Role;
 import net.st1ch.minecraftacademy.blocks.ModBlocks;
 import net.st1ch.minecraftacademy.entity.custom.robot.RobotEntity;
+import net.st1ch.minecraftacademy.network.UDPManager;
 
 import java.util.*;
 
@@ -21,8 +24,7 @@ public class Room {
     private final Map<UUID, Role> participants;
     private final Collection<UUID> participantsUUIDs;
     private final List<BlockPos> wallBlocks;
-    private boolean globalControlAllowed = true;
-    private final Set<UUID> individuallyAllowed = new HashSet<>();
+    private final Map<UUID, Boolean> runPermissions = new HashMap<>();
     private final Map<UUID, RobotEntity> playerRobots = new HashMap<>();
     private BlockPos robotSpawnBlock;
     private Direction robotSpawnFacing = Direction.SOUTH;
@@ -99,8 +101,6 @@ public class Room {
     }
 
     public boolean isRoomWallBlock(BlockPos pos){
-        System.out.println("walls = " + this.wallBlocks);
-        System.out.println("can break = " + this.wallBlocks.contains(pos));
         return this.wallBlocks.contains(pos);
     }
 
@@ -117,7 +117,6 @@ public class Room {
         participants.remove(token);
         participantsUUIDs.remove(uuid);
     }
-
 
     public Role getRole(UUID playerUuid) {
         return participants.getOrDefault(playerUuid, Role.OBSERVER);
@@ -145,6 +144,7 @@ public class Room {
 
         // Присваиваем нового робота игроку
         playerRobots.put(token, robot);
+        runPermissions.put(token, true);
 
         // Сообщаем в чат
 //        if (robot.getWorld() instanceof ServerWorld) {
@@ -168,6 +168,7 @@ public class Room {
     public void setRobotSpawnFacing(Direction dir) {
         this.robotSpawnFacing = dir;
     }
+
     public Direction getRobotSpawnFacing() {
         return robotSpawnFacing;
     }
@@ -185,16 +186,53 @@ public class Room {
     }
 
     public boolean canRun(UUID token) {
-        return globalControlAllowed || individuallyAllowed.contains(token);
+        return runPermissions.get(token);
     }
 
     public void setGlobalControlAllowed(boolean allowed) {
-        globalControlAllowed = allowed;
+        for (UUID token : playerRobots.keySet()) {
+            runPermissions.put(token, allowed);
+        }
+
+        if (!allowed) {
+            for (RobotEntity robot : getAllRobots()) {
+                robot.setMovement(0, 0);
+            }
+        }
+
+        // отправка всем игрокам разрешения/запрета на запуск
+        for (UDPManager.ClientInfo client : MinecraftAcademy.udpManager.getAllClients()) {
+            if (client == null) continue;
+
+            client.canRun = allowed;
+            Map<String, Object> response = new HashMap<>();
+            response.put("type", "status");
+            response.put("status", allowed ? "granted" : "waiting");
+            String responseJson = new Gson().toJson(response);
+
+            MinecraftAcademy.udpManager.sendJson(responseJson, client.address, client.port);
+        }
     }
 
     public void setUserCanRun(UUID token, boolean value) {
-        if (value) individuallyAllowed.add(token);
-        else individuallyAllowed.remove(token);
+        runPermissions.put(token, value);
+
+        if (!value) {
+            RobotEntity robot = getRobotByPlayer(token);
+            robot.setMovement(0, 0);
+        }
+
+        // отправка конкретному игроку разрешения/запрета на запуск
+        UDPManager.ClientInfo client = MinecraftAcademy.udpManager.getClient(token);
+        if (client != null) {
+            client.canRun = value;
+            Map<String, Object> response = new HashMap<>();
+            response.put("type", "status");
+            response.put("status", value ? "granted" : "waiting");
+            String responseJson = new Gson().toJson(response);
+
+            MinecraftAcademy.udpManager.sendJson(responseJson, client.address, client.port);
+        }
     }
 
     public Collection<RobotEntity> getAllRobots() {
