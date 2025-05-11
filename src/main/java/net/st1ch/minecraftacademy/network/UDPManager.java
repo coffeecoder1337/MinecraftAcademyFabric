@@ -22,6 +22,7 @@ public class UDPManager {
     private final BlockingQueue<UDPPacket> incomingPackets = new LinkedBlockingQueue<>();
     private final Map<UUID, ClientInfo> clients = new ConcurrentHashMap<>();
     private final Map<UUID, RobotEntity> robots = new ConcurrentHashMap<>();
+    private boolean running = true;
 
     public UDPManager() throws SocketException {
         this.socket = new DatagramSocket(PORT);
@@ -34,12 +35,17 @@ public class UDPManager {
         new Thread(this::sensorBroadcastLoop, "SensorBroadcaster").start();
     }
 
+    public void stop() {
+        running = false;
+        socket.close();
+    }
+
     public void registerRobot(UUID token, RobotEntity robot) {
         robots.put(token, robot);
     }
 
     private void sensorBroadcastLoop() {
-        while (true) {
+        while (running) {
             try {
                 for (Map.Entry<UUID, ClientInfo> entry : clients.entrySet()) {
                     UUID token = entry.getKey();
@@ -74,7 +80,7 @@ public class UDPManager {
 
     private void receiveLoop() {
         byte[] buffer = new byte[8192];
-        while (true) {
+        while (running) {
             try {
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
@@ -87,7 +93,7 @@ public class UDPManager {
     }
 
     private void processLoop() {
-        while (true) {
+        while (running) {
             try {
                 UDPPacket pkt = incomingPackets.take();
 

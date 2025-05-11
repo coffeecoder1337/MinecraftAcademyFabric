@@ -3,6 +3,7 @@ package net.st1ch.minecraftacademy;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.st1ch.minecraftacademy.auth.UserManager;
 import net.st1ch.minecraftacademy.auth.UserRoleManager;
@@ -85,5 +86,9 @@ public class MinecraftAcademy implements ModInitializer {
 		});
 
 		FabricDefaultAttributeRegistry.register(ModEntities.ROBOT, RobotEntity.createRobotAttributes());
+
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+			udpManager.stop();
+		});
 	}
 }
