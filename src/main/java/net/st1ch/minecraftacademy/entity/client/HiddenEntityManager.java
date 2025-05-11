@@ -34,8 +34,8 @@ public class HiddenEntityManager {
 
     public static void hideAllRobotsExcept(UUID token, Collection<UUID> robots) {
         hiddenRobots.clear();
-        for (UUID p : robots) {
-            if (!p.equals(token)) hiddenPlayers.add(p);
+        for (UUID r : robots) {
+            if (!r.equals(token)) hiddenRobots.add(r);
         }
     }
 

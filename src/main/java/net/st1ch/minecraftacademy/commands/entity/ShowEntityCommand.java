@@ -84,13 +84,13 @@ public class ShowEntityCommand {
                                         return 0;
                                     }
 
-//                                    UUID targetToken = userManager.generateUUID(target.getName().getString(), target.getIp());
+                                    UUID targetToken = userManager.generateUUID(target.getName().getString(), target.getIp());
 
                                     if (targetType.equals("player")) {
                                         HiddenEntityManager.showPlayer(target.getGameProfile().getId());
                                         inviter.sendMessage(Text.literal("Пользователь отображен."));
                                     } else {
-                                        HiddenEntityManager.showRobot(target.getGameProfile().getId());
+                                        HiddenEntityManager.showRobot(room.getRobotByPlayer(targetToken).getUuid());
                                         inviter.sendMessage(Text.literal("Робот отображен."));
                                     }
 

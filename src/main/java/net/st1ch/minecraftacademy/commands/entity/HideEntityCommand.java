@@ -15,6 +15,7 @@ import net.st1ch.minecraftacademy.entity.custom.robot.RobotEntity;
 import net.st1ch.minecraftacademy.room.Room;
 import net.st1ch.minecraftacademy.room.RoomManager;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
@@ -66,13 +67,19 @@ public class HideEntityCommand {
                                     }
                                     Room room = RoomManager.getInstance().getRoom(roomId);
 
-
                                     if (targetName.equals("all")) {
                                         if (targetType.equals("player")) {
                                             HiddenEntityManager.hideAllPlayersExcept(inviter.getGameProfile().getId(), room.getParticipantsUUIDs());
                                             inviter.sendMessage(Text.literal("Пользователи скрыты."));
                                         } else {
-                                            HiddenEntityManager.hideAllRobotsExcept(inviter.getGameProfile().getId(), room.getParticipantsUUIDs());
+                                            RobotEntity inviterRobot = room.getRobotByPlayer(inviterId);
+                                            Collection<RobotEntity> robots = room.getAllRobots();
+                                            Collection<UUID> robotIDs = new ArrayList<>();
+                                            for (RobotEntity robot: robots) {
+                                                robotIDs.add(robot.getUuid());
+                                            }
+
+                                            HiddenEntityManager.hideAllRobotsExcept(inviterRobot.getUuid(), robotIDs);
                                             inviter.sendMessage(Text.literal("Роботы скрыты."));
                                         }
                                         return 1;
@@ -90,7 +97,7 @@ public class HideEntityCommand {
                                         HiddenEntityManager.hidePlayer(target.getGameProfile().getId());
                                         inviter.sendMessage(Text.literal("Пользователь скрыт."));
                                     } else {
-                                        HiddenEntityManager.hideRobot(target.getGameProfile().getId());
+                                        HiddenEntityManager.hideRobot(room.getRobotByPlayer(targetToken).getUuid());
                                         inviter.sendMessage(Text.literal("Робот скрыт."));
                                     }
 
