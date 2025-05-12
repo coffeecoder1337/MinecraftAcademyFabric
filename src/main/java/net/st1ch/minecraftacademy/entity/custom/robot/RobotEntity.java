@@ -1,5 +1,6 @@
 package net.st1ch.minecraftacademy.entity.custom.robot;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.AnimationState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -10,7 +11,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.*;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.st1ch.minecraftacademy.blocks.ModBlocks;
+import net.st1ch.minecraftacademy.competition.CompetitionData;
+import net.st1ch.minecraftacademy.competition.CompetitionManager;
 import net.st1ch.minecraftacademy.network.UDPServer;
+
+import java.util.UUID;
 
 public class RobotEntity extends PathAwareEntity {
     // animations
@@ -31,6 +37,7 @@ public class RobotEntity extends PathAwareEntity {
     public RobotSensors sensors = new RobotSensors(this);
     private int printSensorsTimeout = 40;
 
+    private UUID ownerToken;
     public RobotEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
     }
@@ -69,6 +76,19 @@ public class RobotEntity extends PathAwareEntity {
 
         this.rotationSpeed = normalizedRotationSpeed;
         this.moveSpeed = normalizedMoveSpeed;
+
+        UUID token = this.getOwnerToken();
+
+        // Если робот впервые начал движение — запускаем отсчёт
+        if (!CompetitionManager.getInstance().hasStarted(token) && (rotationSpeed != 0 || moveSpeed != 0)) {
+            CompetitionManager.getInstance().onRobotStart(this);
+        }
+
+//        if (!started && (rotationSpeed != 0 || moveSpeed != 0)) {
+//            started = true;
+//            startTime = System.currentTimeMillis();
+//            CompetitionManager.getInstance().onRobotStart(this);
+//        }
     }
 
     public void sendRobotIdToChat(PlayerEntity player, String robotId) {
@@ -132,17 +152,24 @@ public class RobotEntity extends PathAwareEntity {
 //            this.setupAnimationStates();
         } else {
             this.move();
-//            if (printSensorsTimeout <= 0) { System.out.println(this.sensors.getSensorData()); printSensorsTimeout=40; }
-//            else --printSensorsTimeout;
+            Block block = this.getWorld().getBlockState(this.getBlockPos().down()).getBlock();
+            if (block == ModBlocks.ROBOT_INTEREST_BLOCK) {
+                CompetitionData data = CompetitionManager.getInstance().getData(this.getOwnerToken());
+                if (data != null) {
+                    data.collectPoint(block.getTranslationKey()); // или свой ID
+                }
+            }
+            if (block == ModBlocks.ROBOT_FINISH_BLOCK) {
+                CompetitionManager.getInstance().onRobotFinish(this);
+            }
         }
     }
-}
 
-//// Спавним робота рядом с игроком
-//CustomRobotEntity robot = new CustomRobotEntity(ModEntities.ROBOT, world);
-//robot.refreshPositionAndAngles(spawnPos.getX() + 2, spawnPos.getY(), spawnPos.getZ() + 2, 0, 0);
-//world.spawnEntity(robot);
-//
-//// Отправляем сообщение в чат с ID робота
-//player.sendMessage(Text.of("Ваш робот создан! ID: " + robot.getUuidAsString()), false);
-//
+    public UUID getOwnerToken() {
+        return this.ownerToken;
+    }
+
+    public void setOwnerToken(UUID token) {
+        this.ownerToken = token;
+    }
+}

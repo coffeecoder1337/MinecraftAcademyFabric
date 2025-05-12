@@ -1,16 +1,12 @@
 package net.st1ch.minecraftacademy.commands.invite;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3d;
 import net.st1ch.minecraftacademy.auth.UserManager;
 import net.st1ch.minecraftacademy.auth.UserRoleManager;
-import net.st1ch.minecraftacademy.entity.custom.robot.RobotSpawner;
 import net.st1ch.minecraftacademy.room.*;
 
 import java.util.UUID;

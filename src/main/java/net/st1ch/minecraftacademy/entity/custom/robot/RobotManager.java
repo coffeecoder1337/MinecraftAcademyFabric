@@ -13,7 +13,7 @@ import net.st1ch.minecraftacademy.room.Room;
 
 import java.util.UUID;
 
-public class RobotSpawner {
+public class RobotManager {
     public static void spawnForPlayer(ServerPlayerEntity player, UUID token, Room room) {
         ServerWorld world = player.getServerWorld();
         BlockPos spawn = room.getRobotSpawnPoint();
@@ -33,6 +33,21 @@ public class RobotSpawner {
         MinecraftAcademy.udpManager.registerRobot(token, robot);
         world.spawnEntity(robot);
         room.assignRobotToPlayer(token, robot);
+    }
+
+    public static void moveToSpawn(UUID token, Room room) {
+        BlockPos spawn = room.getRobotSpawnPoint();
+
+        RobotEntity robot = room.getRobotByPlayer(token);
+
+        Direction facing = room.getRobotSpawnFacing();
+        float yaw = facing.asRotation();
+
+//        robot.setPosition(Vec3d.ofCenter(spawn.up()));
+//        robot.setYaw(yaw);
+//        robot.setHeadYaw(yaw);
+//        robot.setBodyYaw(yaw);
+        robot.refreshPositionAndAngles(spawn.up(), yaw, 0);
     }
 
     public static void spawn(ServerWorld world, BlockPos spawn) {

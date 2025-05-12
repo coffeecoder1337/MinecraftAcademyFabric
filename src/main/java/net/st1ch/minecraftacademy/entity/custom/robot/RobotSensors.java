@@ -31,12 +31,16 @@ import static org.lwjgl.opengl.GL11C.*;
 
 public class RobotSensors {
     private final RobotEntity robot;
+    private double leftEncoder;
+    private double rightEncoder;
 //    private final DatagramSocket socket;
 //    private final InetAddress clientAddress;
 //    private final int clientPort;
 
     public RobotSensors(RobotEntity robot) {
         this.robot = robot;
+        leftEncoder = 0;
+        rightEncoder = 0;
 //        this.socket = socket;
 //        this.clientAddress = clientAddress;
 //        this.clientPort = clientPort;
@@ -48,8 +52,15 @@ public class RobotSensors {
         data.put("lidar_2d", getLidar2D());
         data.put("lidar_3d", getLidar3D());
         data.put("color", getColorSensor());
+        data.put("le", leftEncoder);
+        data.put("re", rightEncoder);
         return data;
 //        sendJson(data);
+    }
+
+    public void resetSensors() {
+        this.leftEncoder = 0;
+        this.rightEncoder = 0;
     }
 
     private List<Double> getDistanceSensors() {

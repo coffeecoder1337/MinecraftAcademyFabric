@@ -9,11 +9,10 @@ import net.st1ch.minecraftacademy.auth.Role;
 import net.st1ch.minecraftacademy.auth.User;
 import net.st1ch.minecraftacademy.auth.UserManager;
 import net.st1ch.minecraftacademy.auth.UserRoleManager;
-import net.st1ch.minecraftacademy.entity.custom.robot.RobotSpawner;
+import net.st1ch.minecraftacademy.entity.custom.robot.RobotManager;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class RoomService {
@@ -53,7 +52,7 @@ public class RoomService {
         giveStarterBlocks(player);
 
         // Если у игрока нет робота то создать робота и привязать его к игроку
-        if (room.getRobotByPlayer(token) == null) RobotSpawner.spawnForPlayer(player, token, room);
+        if (room.getRobotByPlayer(token) == null) RobotManager.spawnForPlayer(player, token, room);
 
         player.sendMessage(Text.literal("Вы присоединились к комнате " + roomId + " как " + role.name()));
     }

@@ -23,6 +23,9 @@ public class Room {
     private final Box bounds;
     private final Map<UUID, Role> participants;
     private final Collection<UUID> participantsUUIDs;
+    private final Collection<BlockPos> interestBlocks;
+    private final Collection<BlockPos> finishBlocks;
+
     private final List<BlockPos> wallBlocks;
     private final Map<UUID, Boolean> runPermissions = new HashMap<>();
     private final Map<UUID, RobotEntity> playerRobots = new HashMap<>();
@@ -37,6 +40,8 @@ public class Room {
         this.participantsUUIDs = new ArrayList<>();
         this.wallBlocks = new ArrayList<BlockPos>();
         this.robotSpawnBlock = null;
+        this.interestBlocks = new ArrayList<>();
+        this.finishBlocks = new ArrayList<>();
     }
 
     public String getId() {
@@ -145,6 +150,7 @@ public class Room {
         // Присваиваем нового робота игроку
         playerRobots.put(token, robot);
         runPermissions.put(token, true);
+        robot.setOwnerToken(token);
 
         // Сообщаем в чат
 //        if (robot.getWorld() instanceof ServerWorld) {
@@ -237,6 +243,22 @@ public class Room {
 
     public Collection<RobotEntity> getAllRobots() {
         return this.playerRobots.values();
+    }
+
+    public void addInterestBlock(BlockPos pos) {
+        this.interestBlocks.add(pos);
+    }
+
+    public void removeInterestBlock(BlockPos pos) {
+        this.interestBlocks.remove(pos);
+    }
+
+    public void addFinishBlock(BlockPos pos) {
+        this.finishBlocks.add(pos);
+    }
+
+    public void removeFinishBlock(BlockPos pos) {
+        this.finishBlocks.remove(pos);
     }
 }
 
