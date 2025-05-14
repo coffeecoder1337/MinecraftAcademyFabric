@@ -3,6 +3,7 @@ package net.st1ch.minecraftacademy.room;
 import com.google.gson.Gson;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.datafixer.fix.ChunkPalettedStorageFix;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -86,6 +87,7 @@ public class Room {
                         Block spawnBlock = ModBlocks.ROBOT_SPAWN_BLOCK;
                         world.setBlockState(pos, spawnBlock.getDefaultState());
                         this.setRobotSpawnPoint(pos);
+                        this.setRobotSpawnFacing(Direction.SOUTH); // hardcode
                     } else {
                         world.setBlockState(pos, Blocks.AIR.getDefaultState());
                     }

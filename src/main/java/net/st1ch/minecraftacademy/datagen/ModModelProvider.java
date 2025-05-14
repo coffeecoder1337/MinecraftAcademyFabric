@@ -6,6 +6,7 @@ import net.minecraft.data.client.BlockStateModelGenerator;
 import net.minecraft.data.client.ItemModelGenerator;
 import net.minecraft.data.client.Model;
 import net.minecraft.util.Identifier;
+import net.st1ch.minecraftacademy.blocks.ModBlocks;
 import net.st1ch.minecraftacademy.item.ModItems;
 
 import java.util.Optional;
@@ -18,7 +19,9 @@ public class ModModelProvider extends FabricModelProvider {
 
     @Override
     public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
-
+        blockStateModelGenerator.registerSimpleCubeAll(ModBlocks.ROBOT_SPAWN_BLOCK);
+        blockStateModelGenerator.registerSimpleCubeAll(ModBlocks.ROBOT_FINISH_BLOCK);
+        blockStateModelGenerator.registerSimpleCubeAll(ModBlocks.ROBOT_INTEREST_BLOCK);
     }
 
     @Override

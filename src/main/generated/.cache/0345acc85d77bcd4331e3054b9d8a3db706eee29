@@ -1,2 +1,11 @@
-// 1.21.1	2025-04-03T10:53:41.3883371	Minecraft Academy/Model Definitions
+// 1.21.1	2025-05-14T23:21:42.2324915	Minecraft Academy/Model Definitions
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets\minecraft-academy\models\item\robot_spawn_egg.json
+30a7c7cb1037c2da9f472d40e553fc38191b3d10 assets\minecraft-academy\models\block\robot_interest_block.json
+80f20d0a16de21eebd5e8bf58f33db15c1f89761 assets\minecraft-academy\models\item\robot_spawn_block.json
+77f2719a5883ca2fe81bff59a262eeb725a2ded8 assets\minecraft-academy\blockstates\robot_finish_block.json
+6b0940d95aae439353d49ef8d1e895e39296583c assets\minecraft-academy\models\block\robot_finish_block.json
+6e6b0edf72a002b747bbb53ade46d77439ebafec assets\minecraft-academy\blockstates\robot_interest_block.json
+650b2a4eb7680a4f26e140dc58cf6c07976c76b5 assets\minecraft-academy\models\item\robot_interest_block.json
+a1d2ec7bb379eb44ae66cec4b73bb990a92f440c assets\minecraft-academy\models\block\robot_spawn_block.json
+4d58d19d6933209da1b856d2f117f7512fd0dc3d assets\minecraft-academy\models\item\robot_finish_block.json
+6d033b275bcb10bb44f9242d3ed3aef80492a28f assets\minecraft-academy\blockstates\robot_spawn_block.json
