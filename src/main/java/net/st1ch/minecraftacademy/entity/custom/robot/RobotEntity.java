@@ -9,6 +9,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.*;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.st1ch.minecraftacademy.blocks.ModBlocks;
@@ -155,8 +156,11 @@ public class RobotEntity extends PathAwareEntity {
             Block block = this.getWorld().getBlockState(this.getBlockPos().down()).getBlock();
             if (block == ModBlocks.ROBOT_INTEREST_BLOCK) {
                 CompetitionData data = CompetitionManager.getInstance().getData(this.getOwnerToken());
+                System.out.println("data = " + data);
                 if (data != null) {
-                    data.collectPoint(block.getTranslationKey()); // или свой ID
+                    BlockPos pos = this.getBlockPos().down();
+                    String key = this.getOwnerToken().toString() + "|" + pos.getX() + "|" + pos.getY()+ "|" + pos.getZ();
+                    data.collectPoint(key);
                 }
             }
             if (block == ModBlocks.ROBOT_FINISH_BLOCK) {

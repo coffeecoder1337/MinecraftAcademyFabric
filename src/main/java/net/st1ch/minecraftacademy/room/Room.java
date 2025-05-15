@@ -71,8 +71,8 @@ public class Room {
                             y == min.getY() || y == max.getY() - 1 ||
                             z == min.getZ() || z == max.getZ() - 1;
 
-                    boolean isFloor = (min.getX() + 1 < x && x < max.getX()) &&
-                            (min.getZ() + 1 < z && z < max.getZ()) &&
+                    boolean isFloor = (min.getX()  < x && x < max.getX()) &&
+                            (min.getZ() < z && z < max.getZ()) &&
                             (y == min.getY() + 1);
 
                     Vec3d center = bounds.getCenter();
