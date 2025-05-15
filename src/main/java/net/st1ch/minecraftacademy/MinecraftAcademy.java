@@ -48,15 +48,7 @@ public class MinecraftAcademy implements ModInitializer {
 			userManager,
 			userRoleManager);
 
-	public static final UDPManager udpManager;
-
-    static {
-        try {
-            udpManager = new UDPManager();
-        } catch (SocketException e) {
-            throw new RuntimeException(e);
-        }
-    }
+	public static UDPManager udpManager;
 
     @Override
 	public void onInitialize() {
@@ -64,7 +56,6 @@ public class MinecraftAcademy implements ModInitializer {
 		LOGGER.info("Hello Fabric world!");
 
 //		new Thread(UDPServer::startServer).start();
-		udpManager.start();
 
 		ModItems.registerModItems();
 		ModEntities.registerModEntities();
@@ -86,6 +77,19 @@ public class MinecraftAcademy implements ModInitializer {
 		});
 
 		FabricDefaultAttributeRegistry.register(ModEntities.ROBOT, RobotEntity.createRobotAttributes());
+
+		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+
+			try {
+				udpManager = new UDPManager();
+			} catch (SocketException e) {
+				throw new RuntimeException(e);
+			} finally {
+				udpManager.start();
+
+			}
+
+		});
 
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			udpManager.stop();
