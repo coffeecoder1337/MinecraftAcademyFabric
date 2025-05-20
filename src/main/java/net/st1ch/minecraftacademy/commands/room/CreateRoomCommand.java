@@ -24,19 +24,19 @@ public class CreateRoomCommand {
                                 UserRoleManager roleManager,
                                 RoomService roomService) {
         dispatcher.register(CommandManager.literal("create_room")
-                .then(CommandManager.argument("type", StringArgumentType.word())
-                        .suggests((ctx, builder) -> {
-                            for (RoomType t : RoomType.values()) {
-                                builder.suggest(t.name());
-                            }
-                            return builder.buildFuture();
-                        })
+//                .then(CommandManager.argument("type", StringArgumentType.word())
+//                        .suggests((ctx, builder) -> {
+//                            for (RoomType t : RoomType.values()) {
+//                                builder.suggest(t.name());
+//                            }
+//                            return builder.buildFuture();
+//                        })
                         .executes(ctx -> {
                             ServerPlayerEntity player = ctx.getSource().getPlayer();
                             UUID token = userManager.generateUUID(player.getName().getString(), player.getIp());
 
-                            String typeStr = StringArgumentType.getString(ctx, "type").toUpperCase();
-                            RoomType type = RoomType.valueOf(typeStr);
+//                            String typeStr = StringArgumentType.getString(ctx, "type").toUpperCase();
+//                            RoomType type = RoomType.valueOf(typeStr);
 
                             String currentPlayerRoomID = roleManager.getRoom(token);
 
@@ -45,11 +45,11 @@ public class CreateRoomCommand {
                                 return 0;
                             }
 
-                            Room room = roomManager.createRoom(player, type);
+                            Room room = roomManager.createRoom(player, RoomType.COMPETITION);
                             roomService.joinRoom(player, token, room.getId(), Role.ADMIN);
                             RobotManager.spawnForPlayer(player, token, room);
 
                             return 1;
-                        })));
+                        }));
     }
 }

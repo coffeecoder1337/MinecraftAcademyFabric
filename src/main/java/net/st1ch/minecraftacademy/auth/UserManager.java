@@ -44,5 +44,12 @@ public class UserManager {
     public Collection<User> getAllOnlineUsers() {
         return users.values().stream().filter(User::isOnline).toList();
     }
+
+    public User getByPlayer(ServerPlayerEntity player) {
+        for (User user : this.users.values()) {
+            if (user.getPlayer() == player) return user;
+        }
+        return null;
+    }
 }
 

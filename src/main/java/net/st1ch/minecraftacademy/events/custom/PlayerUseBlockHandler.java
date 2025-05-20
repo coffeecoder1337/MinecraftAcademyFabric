@@ -19,7 +19,7 @@ public class PlayerUseBlockHandler {
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
             BlockPos pos = hitResult.getBlockPos().offset(hitResult.getSide());
             if (!blockAccessController.canPlace(serverPlayer, pos)) {
-                player.sendMessage(Text.literal("Вы не можете ставить блоки в комнате."));
+//                player.sendMessage(Text.literal("Вы не можете ставить блоки в комнате."));
                 return ActionResult.FAIL;
             }
 

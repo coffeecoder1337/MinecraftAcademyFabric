@@ -3,9 +3,9 @@ package net.st1ch.minecraftacademy.room;
 import com.google.gson.Gson;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.datafixer.fix.ChunkPalettedStorageFix;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
@@ -13,6 +13,7 @@ import net.minecraft.util.math.Vec3d;
 import net.st1ch.minecraftacademy.MinecraftAcademy;
 import net.st1ch.minecraftacademy.auth.Role;
 import net.st1ch.minecraftacademy.blocks.ModBlocks;
+import net.st1ch.minecraftacademy.education.EducationLevel;
 import net.st1ch.minecraftacademy.entity.custom.robot.RobotEntity;
 import net.st1ch.minecraftacademy.network.UDPManager;
 
@@ -20,6 +21,7 @@ import java.util.*;
 
 public class Room {
     private final String id;
+    private ServerWorld world;
     private final RoomType type;
     private final Box bounds;
     private final Map<UUID, Role> participants;
@@ -28,6 +30,7 @@ public class Room {
     private final Collection<BlockPos> finishBlocks;
 
     private final List<BlockPos> wallBlocks;
+    private final List<BlockPos> labyrinthBlocks;
     private final Map<UUID, Boolean> runPermissions = new HashMap<>();
     private final Map<UUID, RobotEntity> playerRobots = new HashMap<>();
     private BlockPos robotSpawnBlock;
@@ -40,9 +43,11 @@ public class Room {
         this.participants = new HashMap<>();
         this.participantsUUIDs = new ArrayList<>();
         this.wallBlocks = new ArrayList<BlockPos>();
+        this.labyrinthBlocks = new ArrayList<BlockPos>();
         this.robotSpawnBlock = null;
         this.interestBlocks = new ArrayList<>();
         this.finishBlocks = new ArrayList<>();
+        this.world = null;
     }
 
     public String getId() {
@@ -59,6 +64,7 @@ public class Room {
 
     public void buildRoom(ServerPlayerEntity player) {
         ServerWorld world = player.getServerWorld();
+        this.world = world;
 
         BlockPos min = new BlockPos((int)bounds.minX, (int)bounds.minY, (int)bounds.minZ);
         BlockPos max = new BlockPos((int)bounds.maxX, (int)bounds.maxY, (int)bounds.maxZ);
@@ -96,6 +102,49 @@ public class Room {
         }
     }
 
+    public Room addLabyrinth(EducationLevel level) {
+        if (this.world == null) return this;
+
+        BlockPos start = new BlockPos((int) bounds.minX + 1, (int) bounds.minY + 2, (int) bounds.minZ + 1);
+        for (int z = 0; z < level.layout.size(); z++) {
+            String row = level.layout.get(z);
+            for (int x = 0; x < row.length(); x++) {
+                char symbol = row.charAt(x);
+                BlockPos pos = start.add(x, 0, z);
+
+                switch (symbol) {
+                    case '#' -> {
+                        world.setBlockState(pos, Blocks.WHITE_WOOL.getDefaultState());
+                        world.setBlockState(pos.up(), Blocks.WHITE_WOOL.getDefaultState());
+                        this.labyrinthBlocks.add(pos);
+                        this.labyrinthBlocks.add(pos.up());
+                    }
+                    case 's' -> {
+                        pos = pos.add(0, -1, 0);
+                        Direction dir = Direction.byName(level.spawnFacing.toLowerCase());
+                        world.setBlockState(pos, ModBlocks.ROBOT_SPAWN_BLOCK.getDefaultState().with(Properties.HORIZONTAL_FACING, dir.getOpposite()));
+
+                        world.setBlockState(this.robotSpawnBlock, Blocks.WHITE_WOOL.getDefaultState());
+                        this.setRobotSpawnPoint(pos);
+                        this.setRobotSpawnFacing(dir);
+
+                    }
+                    case 'f' -> {
+                        pos = pos.add(0, -1, 0);
+                        world.setBlockState(pos, ModBlocks.ROBOT_FINISH_BLOCK.getDefaultState());
+                    }
+                    case 'i' -> {
+                        pos = pos.add(0, -1, 0);
+                        world.setBlockState(pos, ModBlocks.ROBOT_INTEREST_BLOCK.getDefaultState());
+                    }
+                    default -> world.setBlockState(pos, Blocks.AIR.getDefaultState());
+                }
+            }
+        }
+
+        return this;
+    }
+
     public void destroyRoom(ServerPlayerEntity player) {
         ServerWorld world = player.getServerWorld();
 
@@ -109,6 +158,10 @@ public class Room {
 
     public boolean isRoomWallBlock(BlockPos pos){
         return this.wallBlocks.contains(pos);
+    }
+
+    public boolean isLabyrinthBlock(BlockPos pos) {
+        return this.labyrinthBlocks.contains(pos);
     }
 
     public boolean isRoomBlock(BlockPos pos){

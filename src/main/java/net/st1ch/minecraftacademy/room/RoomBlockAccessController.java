@@ -36,6 +36,8 @@ public class RoomBlockAccessController {
 
         if (!room.isRoomBlock(pos)) return true; // вне комнаты
 
+        if (room.getType() == RoomType.EDUCATION) return false;
+
         return role == Role.ADMIN || role == Role.OPERATOR;
     }
 
@@ -52,8 +54,14 @@ public class RoomBlockAccessController {
         // за пределами комнаты
         if (!room.isRoomBlock(pos)) return true;
 
+        if (room.getType() == RoomType.EDUCATION) {
+            return placedBlockManager.isPlacedBy(pos, token);
+        }
+
         // админам можно ломать любые блоки, но не блоки комнаты
-        if (role == Role.ADMIN) return !room.isRoomWallBlock(pos);
+        if (role == Role.ADMIN) {
+            return !room.isRoomWallBlock(pos);
+        }
 
         if (role == Role.OPERATOR) {
             return placedBlockManager.isPlacedBy(pos, token);

@@ -15,7 +15,7 @@ public class PlayerBlockBreakHandler {
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
 
             if (!blockAccessController.canBreak(serverPlayer, pos)) {
-                player.sendMessage(Text.literal("Вы не можете ломать этот блок."));
+//                player.sendMessage(Text.literal("Вы не можете ломать этот блок."));
                 return false;
             }
 

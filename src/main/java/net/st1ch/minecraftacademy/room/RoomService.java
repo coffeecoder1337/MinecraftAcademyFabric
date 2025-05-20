@@ -7,7 +7,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.st1ch.minecraftacademy.auth.Role;
 import net.st1ch.minecraftacademy.auth.User;
-import net.st1ch.minecraftacademy.auth.UserManager;
+import static net.st1ch.minecraftacademy.MinecraftAcademy.userManager;
 import net.st1ch.minecraftacademy.auth.UserRoleManager;
 import net.st1ch.minecraftacademy.entity.custom.robot.RobotManager;
 
@@ -17,27 +17,21 @@ import java.util.UUID;
 
 public class RoomService {
     private final HashMap<UUID, Vec3d> playerPosition = new HashMap<>();
-    private final RoomManager roomManager;
-    private final UserRoleManager roleManager;
-    private final UserManager userManager;
+    private static RoomService instance;
 
-    public RoomService(
-            RoomManager roomManager,
-            UserRoleManager roleManager,
-            UserManager userManager
-    ) {
-        this.roomManager = roomManager;
-        this.roleManager = roleManager;
-        this.userManager = userManager;
+    public static RoomService getInstance() {
+        if (instance == null) instance = new RoomService();
+        return instance;
     }
 
     public void joinRoom(ServerPlayerEntity player, UUID token, String roomId, Role role) {
-        Room room = roomManager.getRoom(roomId);
+        Room room = RoomManager.getInstance().getRoom(roomId);
         if (room == null) {
             player.sendMessage(Text.literal("Комната не найдена."));
             return;
         }
 
+        UserRoleManager roleManager = UserRoleManager.getInstance();
         roleManager.assignRoom(token, roomId);
         roleManager.assignRole(token, role);
         room.addParticipant(token, player.getGameProfile().getId(), role);
@@ -52,12 +46,14 @@ public class RoomService {
         giveStarterBlocks(player);
 
         // Если у игрока нет робота то создать робота и привязать его к игроку
-        if (room.getRobotByPlayer(token) == null) RobotManager.spawnForPlayer(player, token, room);
+        if (room.getRobotByPlayer(token) == null && role != Role.OBSERVER) RobotManager.spawnForPlayer(player, token, room);
 
         player.sendMessage(Text.literal("Вы присоединились к комнате " + roomId + " как " + role.name()));
     }
 
     public void leaveRoom(ServerPlayerEntity player, UUID token) {
+        UserRoleManager roleManager = UserRoleManager.getInstance();
+        RoomManager roomManager = RoomManager.getInstance();
         String roomId = roleManager.getRoom(token);
         if (roomId == null) {
             player.sendMessage(Text.literal("Вы не находитесь в комнате."));

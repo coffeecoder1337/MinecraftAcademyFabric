@@ -65,7 +65,12 @@ public class InviteCommand {
                                         return 0;
                                     }
 
-                                    invitationManager.addInvite(targetId, new PendingInvitation(roomId, role, inviterId));
+                                    boolean invite = invitationManager.addInvite(targetId, new PendingInvitation(roomId, role, inviterId));
+                                    if (!invite) {
+                                        inviter.sendMessage(Text.literal("Приглашение не было отправлено."));
+                                        return 0;
+
+                                    }
                                     target.sendMessage(Text.literal("Вас пригласили в комнату " + roomId + " с ролью " + role.name() + ". Введите /accept или /deny."));
 
                                     inviter.sendMessage(Text.literal("Приглашение отправлено игроку " + targetName + "."));
