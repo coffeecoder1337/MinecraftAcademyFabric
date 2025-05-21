@@ -37,9 +37,13 @@ public class SelectEducationLevelHandler {
                         player.sendMessage(Text.literal("Покиньте текущую комнату для создания новой."));
                         return;
                     }
-                    // Создаем комнату с типом EDUCATION и заданным уровнем
-
                     EducationLevel level = EducationLevelLoader.getLevel(levelName);
+                    if (level == null) {
+                        player.sendMessage(Text.literal("Данный уровень еще не создан"));
+                        return;
+                    }
+
+                    // Создаем комнату с типом EDUCATION и заданным уровнем
                     Room room = RoomManager.getInstance().createRoom(player, RoomType.EDUCATION);
                     room.addLabyrinth(level);
                     RoomService.getInstance().joinRoom(player, token, room.getId(), Role.ADMIN);

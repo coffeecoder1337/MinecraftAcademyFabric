@@ -2,10 +2,6 @@
   "levels": [
     {
       "name": "level_1",
-      "button": {
-        "button_text": "Уровень 1: Прямой путь",
-        "level_name": "level_1"
-      },
       "layout": [
         "                                                                ",
         "                                                                ",
@@ -77,10 +73,6 @@
     },
     {
       "name": "level_2",
-      "button": {
-        "button_text": "Уровень 2: С препятствиями",
-        "level_name": "level_2"
-      },
       "layout": [
         "           ",
         " ######### ",

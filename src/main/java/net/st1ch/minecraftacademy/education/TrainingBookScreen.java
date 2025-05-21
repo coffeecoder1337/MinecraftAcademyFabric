@@ -22,63 +22,8 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 public class TrainingBookScreen extends BaseOwoScreen<FlowLayout> {
-    private Map<String, Map<String, String>> menu;
-//    private final Map<String, Map<String, String>> menu = new LinkedHashMap<>() {{
-//        put("Введение", new LinkedHashMap<>(){{
-//            put("О платформе", "Каакой-то текст балбл алала sdfjkakjfhasklf aksjdfh lkjasdh flkjashdffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" +
-//            "asfdlaksjfhklasjhdflkjhasd" +
-//            "fklasdfasdfasfdwqer" +
-//            "" +
-//            "safasdfasdfsadfas" +
-//            "fasdffffffffffffffff" +
-//            "perenos \n qkjwerhkqwehrgkjqwhegrjkqwrasdf" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sadfkhgaskjfhgajskdhfgjkashdgjkashfgffffffffffffasddddddfwqerqw" +
-//            "sdffffffffffffffffsadfasfas");
-//            put("Установка", "Каакой-то текст балбл алала");
-//        }});
-//        put("Команды", new LinkedHashMap<>(){{
-//                put("Команды платформы", "Каакой-то текст балбл алала");
-//                put("Команды робота", "Каакой-то текст балбл алала");
-//
-//        }});
-//        put("Датчики", new LinkedHashMap<>(){{
-//                put("2D лидар", "Каакой-то текст балбл алала");
-//                put("Цвет", "Каакой-то текст балбл алала");
-//                put("Линия", "Каакой-то текст балбл алала");
-//        }});
-//        put("Задачи", new LinkedHashMap<>(){{
-//                put("Пройди квадрат", "Каакой-то текст балбл алала");
-//                put("Объедь стену", "Каакой-то текст балбл алала");
-//        }});
-//    }};
-
-//    private final Map<String, List<String>> toc = Map.of(
-//            "Введение", List.of("О платформе", "Установка"),
-//            "Команды", List.of("Команды платформы", "Команды робота"),
-//            "Датчики", List.of("2D лидар", "Цвет", "Линия"),
-//            "Задачи", List.of("Пройди квадрат", "Объедь стену")
-//    );
-
-    TextAreaComponent contentLabel = new TextAreaComponent(Sizing.fill(80), Sizing.fill(100)) {
+    private Map<String, Map<String, Map<String, Object>>> menu;
+    private TextAreaComponent contentLabel = new TextAreaComponent(Sizing.fill(80), Sizing.fill(100)) {
         @Override
         public boolean onKeyPress(int keyCode, int scanCode, int modifiers) {
             return false; // блокирует ввод с клавиатуры
@@ -92,6 +37,7 @@ public class TrainingBookScreen extends BaseOwoScreen<FlowLayout> {
     };
     private final Map<String, Boolean> expandedSections = new HashMap<>();
     private final Map<String, List<ButtonComponent>> sectionChildren = new HashMap<>();
+    private ButtonComponent levelButton = null;
 
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
@@ -102,24 +48,22 @@ public class TrainingBookScreen extends BaseOwoScreen<FlowLayout> {
     protected void build(FlowLayout rootComponent) {
         this.loadJson();
         rootComponent.surface(Surface.DARK_PANEL)
-                .horizontalAlignment(HorizontalAlignment.CENTER)
-                .verticalAlignment(VerticalAlignment.CENTER)
                 .padding(Insets.of(10));
+
+        rootComponent.horizontalAlignment(HorizontalAlignment.CENTER)
+                .verticalAlignment(VerticalAlignment.CENTER);
 
         FlowLayout mainLayout = Containers.horizontalFlow(Sizing.fill(100), Sizing.fill(100));
         rootComponent.child(mainLayout);
-        mainLayout.child(Components.button(Text.literal("press me"), btn -> {
-            SelectEducationLevelPacket payload = new SelectEducationLevelPacket("level_1");
-            ClientPlayNetworking.send(payload);
-            MinecraftClient.getInstance().setScreen(null);
-        }));
+
+        FlowLayout rightLayout = Containers.verticalFlow(Sizing.content(), Sizing.content());
 
         FlowLayout tocLayout = Containers.verticalFlow(Sizing.content(), Sizing.content());
         tocLayout.surface(Surface.DARK_PANEL).padding(Insets.of(5));
 
-        for (Map.Entry<String, Map<String, String>> entry : menu.entrySet()) {
+        for (Map.Entry<String, Map<String, Map<String, Object>>> entry : menu.entrySet()) {
             String section = entry.getKey();
-            Map<String, String> topics = entry.getValue();
+            Map<String, Map<String, Object>> topics = entry.getValue();
             expandedSections.put(section, false);
 
             // Обработчик нажатия кнопки секции
@@ -133,9 +77,26 @@ public class TrainingBookScreen extends BaseOwoScreen<FlowLayout> {
                 if (!isExpanded) {
                     // Добавляем дочерние кнопки
                     List<ButtonComponent> newButtons = new ArrayList<>();
-                    for (Map.Entry<String, String> topic : topics.entrySet()) {
-                        ButtonComponent topicButton = Components.button(Text.literal("  " + topic.getKey()), subBtn -> {
-                            contentLabel.text("Содержимое: " + topic.getValue());
+                    for (Map.Entry<String, Map<String, Object>> topicEntry : topics.entrySet()) {
+                        String topic = topicEntry.getKey();
+                        Map<String, Object> topicData = (Map<String, Object>) topicEntry.getValue();
+                        String content = (String) topicData.get("content");
+                        Map<String, String> buttonData = (Map<String, String>) topicData.get("button");
+                        ButtonComponent topicButton = Components.button(Text.literal("  " + topic), subBtn -> {
+                            // заполняем контентом
+                            contentLabel.text(content);
+
+                            if (buttonData != null) {
+                                if (levelButton != null) levelButton.remove();
+                                levelButton = Components.button(Text.literal(buttonData.get("button_text")), levelBtn -> {
+                                    SelectEducationLevelPacket payload = new SelectEducationLevelPacket(buttonData.get("level"));
+                                    ClientPlayNetworking.send(payload);
+                                    MinecraftClient.getInstance().setScreen(null);
+                                });
+                                rightLayout.child(levelButton);
+                            } else {
+                                if (levelButton != null) levelButton.remove();
+                            }
                         });
                         newButtons.add(topicButton);
                     }
@@ -175,14 +136,17 @@ public class TrainingBookScreen extends BaseOwoScreen<FlowLayout> {
         ScrollContainer<FlowLayout> tocScroll = Containers.verticalScroll(Sizing.content(), Sizing.fill(100), tocLayout);
         mainLayout.child(tocScroll);
 
-        FlowLayout contentLayout = Containers.verticalFlow(Sizing.content(), Sizing.content());
+
+        FlowLayout contentLayout = Containers.verticalFlow(Sizing.content(), Sizing.fill(80));
         contentLayout.surface(Surface.DARK_PANEL);
         contentLabel.text("Выберите тему слева");
+
 
         contentLayout.child(contentLabel);
         ScrollContainer<FlowLayout> contentScroll = Containers.verticalScroll(Sizing.fill(100), Sizing.fill(100), contentLayout);
 //        contentScroll.margins(Insets.of(10));
-        mainLayout.child(contentScroll);
+        rightLayout.child(contentLayout);
+        mainLayout.child(rightLayout);
     }
 
     private void loadJson() {
@@ -195,7 +159,7 @@ public class TrainingBookScreen extends BaseOwoScreen<FlowLayout> {
 
                 )
         )) {
-            Type type = new TypeToken<LinkedHashMap<String, LinkedHashMap<String, String>>>() {}.getType();
+            Type type = new TypeToken<LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Object>>>>() {}.getType();
             this.menu = new Gson().fromJson(reader, type);
         } catch (Exception e) {
             System.err.println("Ошибка загрузки JSON структуры обучающей книги: " + e.getMessage());
