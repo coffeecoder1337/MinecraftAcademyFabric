@@ -44,7 +44,9 @@ public class SelectEducationLevelHandler {
                     }
 
                     // Создаем комнату с типом EDUCATION и заданным уровнем
-                    Room room = RoomManager.getInstance().createRoom(player, RoomType.EDUCATION);
+                    int depth = level.layout.size() + 2;
+                    int width = level.layout.getFirst().length() + 2;
+                    Room room = RoomManager.getInstance().createRoom(player, RoomType.EDUCATION, width, depth);
                     room.addLabyrinth(level);
                     RoomService.getInstance().joinRoom(player, token, room.getId(), Role.ADMIN);
 

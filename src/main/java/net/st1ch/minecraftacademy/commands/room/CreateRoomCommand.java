@@ -45,7 +45,7 @@ public class CreateRoomCommand {
                                 return 0;
                             }
 
-                            Room room = roomManager.createRoom(player, RoomType.COMPETITION);
+                            Room room = roomManager.createRoom(player, RoomType.COMPETITION, 64, 64);
                             roomService.joinRoom(player, token, room.getId(), Role.ADMIN);
                             RobotManager.spawnForPlayer(player, token, room);
 

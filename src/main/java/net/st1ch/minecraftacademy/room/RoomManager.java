@@ -76,12 +76,12 @@ public class RoomManager {
     }
 
 
-    public Room createRoom(ServerPlayerEntity player, RoomType type) {
+    public Room createRoom(ServerPlayerEntity player, RoomType type, int width, int depth) {
         String id = UUID.randomUUID().toString().substring(0, 8);
         Box bounds = generateRoomBoundsSpiral(
                 this.getAllRooms(),
                 new BlockPos(0, 64, 0),      // центр генерации
-                64, 12, 64,              // размеры комнаты
+                width, 12, depth,              // размеры комнаты
                 5                                    // отступ
         );
         Room room = new Room(id, type, bounds);
