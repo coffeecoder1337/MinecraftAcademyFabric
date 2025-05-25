@@ -1,0 +1,10 @@
+{
+  "item.minecraft-academy.some_item": "Простой предмет",
+  "item.minecraft-academy.magic_stick": "Волшебная палочка",
+  "item.minecraft-academy.training_book": "Руководство MinecraftAcademy",
+  "item.minecraft-academy.robot_spawn_egg": "Яйцо призива Робота",
+  "block.minecraft-academy.robot_spawn_block": "Спавн Робота",
+  "block.minecraft-academy.robot_finish_block": "Финиш Робота",
+  "block.minecraft-academy.robot_interest_block": "Точка интереса Робота",
+  "entity.minecraft-academy.robot": "Образовательный Робот"
+}

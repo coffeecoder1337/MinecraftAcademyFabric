@@ -133,6 +133,10 @@ public class Room {
                         pos = pos.add(0, -1, 0);
                         world.setBlockState(pos, ModBlocks.ROBOT_FINISH_BLOCK.getDefaultState());
                     }
+                    case '0' -> {
+                        pos = pos.add(0, -1, 0);
+                        world.setBlockState(pos, Blocks.BLACK_WOOL.getDefaultState());
+                    }
                     case 'i' -> {
                         pos = pos.add(0, -1, 0);
                         world.setBlockState(pos, ModBlocks.ROBOT_INTEREST_BLOCK.getDefaultState());
